@@ -1,0 +1,40 @@
+# Wrangler 配置文件
+# 用于使用Cloudflare Wrangler CLI部署Worker
+
+name = "lensify-calculator"
+main = "worker.js"
+compatibility_date = "2023-05-18"
+
+# 触发器配置
+# 以下是几种常见的路由配置示例，选择一种取消注释并替换example.com为您的实际域名
+[triggers]
+# 示例1：将Worker绑定到api子域的/calculate路径
+routes = [
+  { pattern = "lensify.encveil.dev/*", zone_name = "encveil.dev" }
+]
+
+# 示例2：将Worker绑定到主域名的/api/calculate路径
+# routes = [
+#   { pattern = "example.com/api/calculate*", zone_name = "example.com" }
+# ]
+
+# 示例3：将Worker绑定到专用的计算器子域
+# routes = [
+#   { pattern = "calculator.example.com/*", zone_name = "example.com" }
+# ]
+
+# 示例4：捕获多个路径
+# routes = [
+#   { pattern = "example.com/tools/lensify/*", zone_name = "example.com" },
+#   { pattern = "api.example.com/v1/calculate*", zone_name = "example.com" }
+# ]
+
+# 环境变量示例
+# [vars]
+# API_KEY = "your-api-key-here"
+
+# 使用以下命令安装 Wrangler CLI:
+# npm install -g wrangler
+
+# 使用以下命令部署 Worker:
+# wrangler deploy 

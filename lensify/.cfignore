@@ -1,0 +1,26 @@
+# Cloudflare Pages 忽略文件
+
+# 忽略计划文件
+../Plan.md
+Plan.md
+*.md
+!README.md
+
+# 忽略构建文件
+node_modules/
+dist/
+build/
+
+# 忽略环境文件
+.env
+.env.*
+
+# 忽略版本控制文件
+.git/
+.gitignore
+
+# 忽略临时和备份文件
+*.tmp
+*.bak
+*.swp
+*.log 
