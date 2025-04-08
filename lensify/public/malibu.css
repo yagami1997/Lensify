@@ -2,21 +2,28 @@
  * Malibu CSS - Lensify项目样式表
  * 
  * 这个样式表定义了Lensify计算器的视觉外观
- * 采用简洁现代的设计风格
+ * 采用加州阳光风格的设计
  */
 
 :root {
-  /* 颜色变量 */
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
-  --background-color: #f8fafc;
-  --card-color: #ffffff;
-  --text-color: #1e293b;
-  --text-light: #64748b;
-  --border-color: #e2e8f0;
-  --highlight-color: #dbeafe;
-  --error-color: #ef4444;
-  --success-color: #10b981;
+  /* 主色调 - 加州阳光风格 */
+  --ocean-blue: #003153;       /* 深海蓝 - 主色调 */
+  --wine-red: #85120F;         /* 红酒色 - 按钮色 */
+  --sand-beige: #E3C79F;       /* 沙滩米色 - 上传框背景 */
+  --sky-light: #D4F1F9;        /* 浅蓝天空 - 背景渐变起始 */
+  --sand-light: #FDF6EC;       /* 浅沙色 - 背景渐变结束 */
+  --sand-dark: #D5BFA3;        /* 深沙色 - 边框和分隔线 */
+  
+  /* 文字颜色 */
+  --text-dark: #222B45;        /* 深色文字 */
+  --text-light: #8F9BB3;       /* 浅色文字 */
+  --text-white: #FFFFFF;       /* 白色文字 */
+  
+  /* 功能色 */
+  --success: #00866E;          /* 成功色 - 加州松绿 */
+  --warning: #F9A826;          /* 警告色 - 加州橙 */
+  --error: #C53030;            /* 错误色 - 加州红 */
+  --coral: #FF7043;            /* 珊瑚色 - 辅助色 */
   
   /* 间距变量 */
   --spacing-xs: 0.25rem;
@@ -45,8 +52,8 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background: linear-gradient(135deg, var(--sky-light) 0%, var(--sand-light) 100%);
+  color: var(--text-dark);
   line-height: 1.6;
   min-height: 100vh;
   padding: var(--spacing-md);
@@ -69,8 +76,9 @@ header {
 h1 {
   font-size: 2.5rem;
   font-weight: 600;
-  color: var(--primary-color);
+  color: var(--ocean-blue);
   margin-bottom: var(--spacing-xs);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
@@ -80,11 +88,12 @@ h1 {
 
 /* 卡片样式 */
 .calculator-card {
-  background-color: var(--card-color);
+  background-color: var(--sand-light);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
   padding: var(--spacing-xl);
   margin-bottom: var(--spacing-xl);
+  border: 1px solid var(--sand-dark);
 }
 
 /* 表单元素 */
@@ -96,32 +105,33 @@ label {
   display: block;
   margin-bottom: var(--spacing-sm);
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--text-dark);
 }
 
 .form-control {
   width: 100%;
   padding: var(--spacing-md);
   font-size: 1rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--sand-dark);
   border-radius: var(--border-radius-md);
-  background-color: var(--card-color);
-  color: var(--text-color);
+  background-color: var(--text-white);
+  color: var(--text-dark);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-color: var(--ocean-blue);
+  box-shadow: 0 0 0 3px rgba(0, 49, 83, 0.2);
 }
 
 select.form-control {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%231e293b' d='M4.646 6.646a.5.5 0 01.708 0L8 9.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23222B45' d='M4.646 6.646a.5.5 0 01.708 0L8 9.293l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   padding-right: 2.5rem;
+  background-color: var(--sand-beige);
 }
 
 /* 光圈输入前缀样式 */
@@ -141,38 +151,46 @@ select.form-control {
 
 input[type="number"] {
   padding-left: 2.5rem;
+  background-color: var(--sand-beige);
 }
 
 /* 按钮样式 */
 .btn-calculate {
   width: 100%;
   padding: var(--spacing-md);
-  background-color: var(--primary-color);
-  color: white;
+  background-color: var(--wine-red);
+  color: var(--text-white);
   border: none;
   border-radius: var(--border-radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
   margin-bottom: var(--spacing-lg);
+  box-shadow: 0 2px 4px rgba(133, 18, 15, 0.3);
 }
 
 .btn-calculate:hover {
-  background-color: var(--primary-hover);
+  background-color: #6A0F0D; /* 深红酒色 */
+  transform: translateY(-2px);
+}
+
+.btn-calculate:active {
+  transform: translateY(0);
 }
 
 .btn-calculate:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 0 3px rgba(133, 18, 15, 0.3);
 }
 
 /* 结果区域 */
 .result-container {
-  background-color: var(--highlight-color);
+  background-color: var(--sky-light);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-lg);
   margin-top: var(--spacing-lg);
+  border: 1px solid rgba(0, 49, 83, 0.2);
 }
 
 .result-container.hidden {
@@ -182,7 +200,7 @@ input[type="number"] {
 .result-container h3 {
   font-size: 1.2rem;
   margin-bottom: var(--spacing-md);
-  color: var(--primary-color);
+  color: var(--ocean-blue);
 }
 
 .result-grid {
@@ -198,6 +216,7 @@ input[type="number"] {
   border-radius: var(--border-radius-sm);
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--sand-dark);
 }
 
 .result-label {
@@ -209,16 +228,16 @@ input[type="number"] {
 .result-value {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--text-dark);
 }
 
 .result-item.highlight {
-  background-color: white;
-  border: 1px solid var(--primary-color);
+  background-color: var(--text-white);
+  border: 1px solid var(--ocean-blue);
 }
 
 .result-item.highlight .result-value {
-  color: var(--primary-color);
+  color: var(--ocean-blue);
   font-size: 1.3rem;
 }
 
@@ -227,6 +246,9 @@ input[type="number"] {
   color: var(--text-light);
   margin-top: var(--spacing-md);
   line-height: 1.5;
+  padding: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: var(--border-radius-sm);
 }
 
 /* 页脚样式 */
@@ -236,6 +258,13 @@ footer {
   padding: var(--spacing-lg) 0;
   color: var(--text-light);
   font-size: 0.875rem;
+}
+
+.motto {
+  margin-top: var(--spacing-xs);
+  font-style: italic;
+  color: var(--coral);
+  font-size: 0.8rem;
 }
 
 /* 响应式设计 */
@@ -250,5 +279,9 @@ footer {
   
   h1 {
     font-size: 2rem;
+  }
+  
+  body {
+    padding: var(--spacing-sm);
   }
 }

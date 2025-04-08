@@ -78,8 +78,14 @@ async function calculateEquivalentAperture() {
     calculateButton.disabled = true;
     calculateButton.textContent = "Calculating...";
     
-    // 构建API URL - 使用自定义域名直接请求，路径就是根路径
+    // 构建API URL - 尝试不同的URL构建方式
+    // 方式1: 原始URL(无路径)
     const url = `${API_URL}?sensorSize=${encodeURIComponent(sensorSize)}&aperture=${encodeURIComponent(aperture)}`;
+    
+    // 方式2: 添加/calculate路径(如果方式1不工作，可以尝试取消注释此行)
+    // const url = `${API_URL}/calculate?sensorSize=${encodeURIComponent(sensorSize)}&aperture=${encodeURIComponent(aperture)}`;
+    
+    console.log("Requesting:", url); // 添加调试信息
     
     // 发送请求
     const response = await fetch(url);
