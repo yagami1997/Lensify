@@ -31,7 +31,7 @@ routes = [
 
 # Cloudflare Pages 配置 - 使用正确的键名
 # 注意：对于Pages，必须使用 pages_build_output_dir 而不是 bucket
-pages_build_output_dir = "public"
+pages_build_output_dir = "lensify/public"
 
 # 排除文件配置
 [build]
