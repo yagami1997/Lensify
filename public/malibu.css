@@ -251,50 +251,94 @@ input[type="number"] {
   border-radius: var(--border-radius-sm);
 }
 
-/* 页脚样式 */
-footer {
-  text-align: center;
-  margin-top: var(--spacing-xl);
-  padding: var(--spacing-lg) 0;
-  color: var(--text-light);
-  font-size: 0.875rem;
+/* 标签页样式 */
+.tab-container {
+  margin-bottom: var(--spacing-xl);
 }
 
-.motto {
-  margin-top: var(--spacing-xs);
-  font-style: italic;
-  color: var(--coral);
-  font-size: 0.8rem;
+.tab-buttons {
+  display: flex;
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 2px solid var(--sand-dark);
 }
 
-/* 响应式设计 */
-@media (max-width: 640px) {
-  .result-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .calculator-card {
-    padding: var(--spacing-lg);
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-  
-  body {
-    padding: var(--spacing-sm);
-  }
-}
-
-/* 状态横幅样式 */
-.status-banner {
-  background-color: var(--warning);
-  color: var(--text-white);
-  text-align: center;
-  padding: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
-  border-radius: var(--border-radius-md);
+.tab-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
   font-weight: 500;
+  color: var(--text-light);
+  position: relative;
+  transition: color 0.2s;
+}
+
+.tab-button:hover {
+  color: var(--ocean-blue);
+}
+
+.tab-button.active {
+  color: var(--ocean-blue);
+  font-weight: 600;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--ocean-blue);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 焦距计算器特定样式 */
+.focal-length-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.result-section {
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid rgba(0, 49, 83, 0.1);
+}
+
+.result-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.result-section h4 {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--ocean-blue);
+}
+
+/* 状态banner */
+.status-banner {
+  background-color: rgba(249, 168, 38, 0.2);
+  border: 1px solid var(--warning);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
 }
 
 .status-banner.hidden {
@@ -302,5 +346,65 @@ footer {
 }
 
 .status-message {
-  margin: 0;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+/* 页脚样式 */
+footer {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--sand-dark);
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+.motto {
+  font-style: italic;
+  margin-top: var(--spacing-xs);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .focal-length-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .calculator-card {
+    padding: var(--spacing-md);
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .result-container {
+    padding: var(--spacing-md);
+  }
+  
+  .tab-buttons {
+    flex-direction: column;
+    border-bottom: none;
+  }
+  
+  .tab-button {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--sand-dark);
+  }
+  
+  .tab-button.active::after {
+    display: none;
+  }
+  
+  .tab-button.active {
+    background-color: var(--sky-light);
+    border-bottom: 1px solid var(--ocean-blue);
+  }
 }
