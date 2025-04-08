@@ -12,6 +12,10 @@ routes = [
   { pattern = "lensify.encveil.dev/*", zone_name = "encveil.dev" }
 ]
 
+# SSL 配置
+[ssl]
+certificate_mode = "managed_by_cloudflare"
+
 # 示例2：将Worker绑定到主域名的/api/calculate路径
 # routes = [
 #   { pattern = "example.com/api/calculate*", zone_name = "example.com" }
