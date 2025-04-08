@@ -42,10 +42,10 @@ const SENSORS = {
   "1/4": { cropFactor: 9.6, name: "1/4-inch" }
 };
 
-// CORS headers settings - allow cross-origin requests
+// CORS headers
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Content-Type": "application/json"
 };
@@ -186,56 +186,11 @@ function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFoc
   };
 }
 
-/**
- * Main function to handle API requests
- */
-async function handleRequest(request) {
-  // Add health check endpoint
+// Handle API requests
+async function handleApiRequest(request) {
   const url = new URL(request.url);
   const path = url.pathname;
-  
-  // Handle static files for frontend
-  if (path === "/" || !path.startsWith("/api")) {
-    try {
-      // Preserve all original headers and method for the fetch request
-      const pagesDomain = "lensify-calculator.pages.dev";
-      
-      // Create a new request with the appropriate URL
-      let pagesUrl = `https://${pagesDomain}${path}`;
-      if (path === "/") {
-        pagesUrl = `https://${pagesDomain}/index.html`;
-      }
-      
-      // Create a new request object with the same method and headers
-      const pageRequest = new Request(pagesUrl, {
-        method: request.method,
-        headers: request.headers,
-        body: request.body,
-        redirect: 'follow'
-      });
-      
-      // Fetch the content from Pages deployment
-      const response = await fetch(pageRequest);
-      
-      // Return the response with appropriate headers
-      const newResponse = new Response(response.body, response);
-      
-      // Make sure to add CORS headers if needed
-      newResponse.headers.set('Access-Control-Allow-Origin', '*');
-      
-      return newResponse;
-    } catch (error) {
-      console.error("Error fetching from Pages:", error);
-      return new Response(JSON.stringify({ 
-        error: "Failed to fetch static content", 
-        details: error.message 
-      }), { 
-        status: 500, 
-        headers: corsHeaders 
-      });
-    }
-  }
-  
+
   // Handle API health check
   if (path === "/api/health" || path === "/api") {
     return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
@@ -245,30 +200,18 @@ async function handleRequest(request) {
       }
     });
   }
-  
+
   // Handle OPTIONS preflight requests
   if (request.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Debug info: log request details
-  console.log("Request URL:", request.url);
-  console.log("Request method:", request.method);
-  console.log("Request path:", path);
-  
   // Check if this is an equivalent sensor calculation request
   if (path === "/api/focal-equiv" || path === "/api/focal-equivalent") {
     const originalSensorId = safeString(url.searchParams.get("originalSensor"));
     const originalFocalLength = safeNumber(url.searchParams.get("originalFocal"));
     const newFocalLength = safeNumber(url.searchParams.get("newFocal"));
     const aperture = safeNumber(url.searchParams.get("aperture"));
-    
-    console.log("Focal Equiv Params:", { 
-      originalSensorId, 
-      originalFocalLength, 
-      newFocalLength, 
-      aperture 
-    });
     
     // Validate parameters
     if (!originalSensorId || !SENSORS[originalSensorId]) {
@@ -311,12 +254,10 @@ async function handleRequest(request) {
   }
   
   // Regular aperture equivalent calculation
-  if (path === "/api/calculate" || path === "/api") {
+  if (path === "/api/calculate") {
     // Get sensor type and aperture value parameters
     const sensorSize = safeString(url.searchParams.get("sensorSize"));
     const aperture = safeNumber(url.searchParams.get("aperture"));
-    
-    console.log("Aperture Equiv Params:", { sensorSize, aperture });
 
     // Validate parameters
     if (!sensorSize || !SENSORS[sensorSize]) {
@@ -350,11 +291,34 @@ async function handleRequest(request) {
     return new Response(JSON.stringify(result), { headers: corsHeaders });
   }
   
-  // For any other path, return a 404 response
+  // For any other API path, return a 404 response
   return new Response(
     JSON.stringify({ error: "Not Found", path: path }),
     { status: 404, headers: corsHeaders }
   );
+}
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  
+  // API endpoints
+  if (url.pathname.startsWith('/api/')) {
+    return handleApiRequest(request);
+  }
+
+  // For all other requests, proxy to Cloudflare Pages
+  try {
+    const pagesUrl = new URL(url.pathname, 'https://lensify.pages.dev');
+    const pageRequest = new Request(pagesUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body
+    });
+    
+    return fetch(pageRequest);
+  } catch (error) {
+    return new Response('Error proxying to Pages: ' + error.message, { status: 500 });
+  }
 }
 
 // Register the Worker's fetch event handler
