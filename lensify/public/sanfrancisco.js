@@ -6,7 +6,7 @@
  */
 
 // Worker API URL configuration - supports multiple URL formats for compatibility
-const API_URL = "https://ad437ef1.lensify.pages.dev/api";
+const API_URL = "https://lensify.encveil.dev/api";
 const FALLBACK_URL = "https://lensify.pages.dev/api";
 
 // Custom route URL examples (choose one based on your actual configuration and uncomment)
