@@ -29,10 +29,9 @@ routes = [
 #   { pattern = "api.example.com/v1/calculate*", zone_name = "example.com" }
 # ]
 
-# Cloudflare Pages 配置
-[site]
-bucket = "./public"  # 指定静态资源目录
-entry-point = "."   # Worker脚本位置
+# Cloudflare Pages 配置 - 使用正确的键名
+# 注意：对于Pages，必须使用 pages_build_output_dir 而不是 bucket
+pages_build_output_dir = "public"
 
 # 排除文件配置
 [build]
