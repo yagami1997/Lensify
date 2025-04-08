@@ -285,3 +285,22 @@ footer {
     padding: var(--spacing-sm);
   }
 }
+
+/* 状态横幅样式 */
+.status-banner {
+  background-color: var(--warning);
+  color: var(--text-white);
+  text-align: center;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+}
+
+.status-banner.hidden {
+  display: none;
+}
+
+.status-message {
+  margin: 0;
+}
