@@ -195,7 +195,7 @@ async function handleRequest(request) {
   const path = url.pathname;
   
   // Handle health check
-  if (path === "/health" || path === "/") {
+  if (path === "/api/health" || path === "/api") {
     return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
       headers: {
         ...corsHeaders,
@@ -215,7 +215,7 @@ async function handleRequest(request) {
   console.log("Request path:", path);
   
   // Check if this is an equivalent sensor calculation request
-  if (path === "/focal-equiv" || path === "/focal-equivalent") {
+  if (path === "/api/focal-equiv" || path === "/api/focal-equivalent") {
     const originalSensorId = safeString(url.searchParams.get("originalSensor"));
     const originalFocalLength = safeNumber(url.searchParams.get("originalFocal"));
     const newFocalLength = safeNumber(url.searchParams.get("newFocal"));
@@ -269,42 +269,50 @@ async function handleRequest(request) {
   }
   
   // Regular aperture equivalent calculation
-  // Get sensor type and aperture value parameters
-  const sensorSize = safeString(url.searchParams.get("sensorSize"));
-  const aperture = safeNumber(url.searchParams.get("aperture"));
+  if (path === "/api/calculate" || path === "/api") {
+    // Get sensor type and aperture value parameters
+    const sensorSize = safeString(url.searchParams.get("sensorSize"));
+    const aperture = safeNumber(url.searchParams.get("aperture"));
+    
+    console.log("Aperture Equiv Params:", { sensorSize, aperture });
+
+    // Validate parameters
+    if (!sensorSize || !SENSORS[sensorSize]) {
+      return new Response(
+        JSON.stringify({ error: "Invalid sensor size" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    if (aperture <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid aperture value" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    // Get sensor crop factor and calculate equivalent aperture
+    const sensorData = SENSORS[sensorSize];
+    const cropFactor = safeNumber(sensorData.cropFactor, 1);
+    const equivalentAperture = safeFormattedNumber(aperture * cropFactor, 1);
+
+    // Return calculation results
+    const result = {
+      sensorSize: safeString(sensorData.name),
+      sensorId: sensorSize,
+      cropFactor: cropFactor,
+      inputAperture: safeFormattedNumber(aperture, 1),
+      equivalentAperture: equivalentAperture
+    };
+
+    return new Response(JSON.stringify(result), { headers: corsHeaders });
+  }
   
-  console.log("Aperture Equiv Params:", { sensorSize, aperture });
-
-  // Validate parameters
-  if (!sensorSize || !SENSORS[sensorSize]) {
-    return new Response(
-      JSON.stringify({ error: "Invalid sensor size" }),
-      { status: 400, headers: corsHeaders }
-    );
-  }
-
-  if (aperture <= 0) {
-    return new Response(
-      JSON.stringify({ error: "Invalid aperture value" }),
-      { status: 400, headers: corsHeaders }
-    );
-  }
-
-  // Get sensor crop factor and calculate equivalent aperture
-  const sensorData = SENSORS[sensorSize];
-  const cropFactor = safeNumber(sensorData.cropFactor, 1);
-  const equivalentAperture = safeFormattedNumber(aperture * cropFactor, 1);
-
-  // Return calculation results
-  const result = {
-    sensorSize: safeString(sensorData.name),
-    sensorId: sensorSize,
-    cropFactor: cropFactor,
-    inputAperture: safeFormattedNumber(aperture, 1),
-    equivalentAperture: equivalentAperture
-  };
-
-  return new Response(JSON.stringify(result), { headers: corsHeaders });
+  // For any other path, return a 404 response
+  return new Response(
+    JSON.stringify({ error: "Not Found", path: path }),
+    { status: 404, headers: corsHeaders }
+  );
 }
 
 // Register the Worker's fetch event handler
