@@ -320,12 +320,15 @@ async function calculateFocalEquivalent() {
     if (!response || !response.ok) {
       console.log("All API endpoints failed, using local calculation");
       const result = calculateLocalFocalEquivalent(originalSensor, originalFocal, newFocal, aperture);
-      updateFocalResultUI(result);
+      updateFocalResultUI({...result, aperture});
       return;
     }
     
     // 解析响应数据
     const data = await response.json();
+    
+    // 添加原始光圈值以便UI显示
+    data.aperture = aperture;
     
     // 更新结果UI
     updateFocalResultUI(data);
@@ -335,7 +338,7 @@ async function calculateFocalEquivalent() {
     
     // 使用本地计算
     const result = calculateLocalFocalEquivalent(originalSensor, originalFocal, newFocal, aperture);
-    updateFocalResultUI(result);
+    updateFocalResultUI({...result, aperture});
   } finally {
     // 恢复按钮状态
     calculateFocalButton.disabled = false;
@@ -350,8 +353,11 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
   // 获取原始传感器的裁切系数
   const originalCropFactor = SENSORS[originalSensorId]?.cropFactor || 1.0;
   
+  // 计算数码变焦下的实际使用传感器面积比例
+  const areaRatio = (newFocalLength / originalFocalLength) ** 2;
+  
   // 计算新的等效裁切系数
-  const newCropFactor = parseFloat((originalCropFactor * (originalFocalLength / newFocalLength)).toFixed(2));
+  const newCropFactor = parseFloat((originalCropFactor * (newFocalLength / originalFocalLength)).toFixed(2));
   
   // 找到最接近的传感器
   let closestSensor = null;
@@ -369,14 +375,26 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
     }
   }
   
+  // 计算当前实际等效的传感器尺寸
+  let effectiveSensorSize;
+  if (originalSensorId.startsWith("1/")) {
+    // 如果原始传感器是1/x形式
+    const originalDenominator = parseFloat(originalSensorId.substring(2));
+    const newDenominator = originalDenominator * Math.sqrt(areaRatio);
+    effectiveSensorSize = `1/${newDenominator.toFixed(2)}`;
+  } else {
+    // 如果是其他形式的传感器尺寸，直接使用closestSensor
+    effectiveSensorSize = closestSensor.name;
+  }
+  
   // 计算等效光圈
-  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(2));
+  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(1));
   
   // 计算视角变化
   const angleOfViewChange = parseFloat((1 - (newFocalLength / originalFocalLength)) * 100).toFixed(1);
   
   // 计算感光面积相对变化
-  const relativeSensorArea = parseFloat(((originalCropFactor / newCropFactor) ** 2).toFixed(2));
+  const relativeSensorArea = parseFloat((1 / areaRatio).toFixed(2));
   
   // 计算等效焦距（相对于全画幅）
   const originalEquivalentFocalLength = parseFloat((originalFocalLength * originalCropFactor).toFixed(1));
@@ -386,6 +404,7 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
   return {
     exactCropFactor: newCropFactor,
     closestSensor: closestSensor,
+    effectiveSensorSize: effectiveSensorSize,
     cropFactorDifference: parseFloat(minDifference.toFixed(3)),
     equivalentAperture: equivalentAperture,
     originalFocalLength: originalFocalLength,
@@ -397,6 +416,7 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
     },
     angleOfViewChange: `${angleOfViewChange}%`,
     relativeSensorArea: relativeSensorArea,
+    areaRatio: parseFloat(areaRatio.toFixed(2)),
     originalEquivalentFocalLength: originalEquivalentFocalLength,
     newEquivalentFocalLength: newEquivalentFocalLength
   };
@@ -426,20 +446,30 @@ function updateFocalResultUI(data) {
   // 传感器信息
   document.getElementById("result-original-sensor").textContent = data.originalSensor.name;
   document.getElementById("result-original-crop").textContent = data.originalSensor.cropFactor.toFixed(2);
-  document.getElementById("result-equivalent-sensor").textContent = data.closestSensor.name;
+  
+  // 更新等效传感器信息（重点显示实际使用的感光面积）
+  document.getElementById("result-equivalent-sensor").textContent = data.effectiveSensorSize || data.closestSensor.name;
   document.getElementById("result-new-crop").textContent = data.exactCropFactor.toFixed(2);
   
   // 镜头性能
   document.getElementById("result-original-focal").textContent = `${data.originalFocalLength}mm`;
   document.getElementById("result-new-focal").textContent = `${data.newFocalLength}mm`;
-  document.getElementById("result-focal-aperture").textContent = `f/${data.equivalentAperture / data.exactCropFactor * data.closestSensor.cropFactor}`;
+  
+  // 修复光圈显示，保留一位小数
+  document.getElementById("result-focal-aperture").textContent = `f/${data.aperture ? data.aperture.toFixed(1) : focalApertureInput.value}`;
   document.getElementById("result-focal-equivalent-aperture").textContent = `f/${data.equivalentAperture.toFixed(1)}`;
   
   // 附加信息
+  // 修改为更有意义的信息：使用面积比和数码变焦倍率
   document.getElementById("result-original-equiv-focal").textContent = `${data.originalEquivalentFocalLength}mm`;
   document.getElementById("result-new-equiv-focal").textContent = `${data.newEquivalentFocalLength}mm`;
-  document.getElementById("result-angle-change").textContent = data.angleOfViewChange;
-  document.getElementById("result-relative-area").textContent = `${data.relativeSensorArea}x`;
+  
+  // 变焦倍率
+  const zoomRatio = (data.newFocalLength / data.originalFocalLength).toFixed(1);
+  document.getElementById("result-angle-change").textContent = `${zoomRatio}x`;
+  
+  // 显示实际使用的传感器面积比例
+  document.getElementById("result-relative-area").textContent = `${((1 / data.areaRatio) * 100).toFixed(0)}%`;
   
   // 显示结果容器
   focalResultContainer.classList.remove("hidden");

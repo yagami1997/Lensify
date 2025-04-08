@@ -2,11 +2,11 @@
  * Lensify - Sensor and Aperture Calculator
  * Cloudflare Worker implementation
  * 
- * 这个Worker实现了传感器尺寸和光圈转换的计算功能
- * 根据输入的传感器类型和光圈值，计算等效光圈
+ * This Worker implements sensor size and aperture conversion calculations
+ * Based on the input sensor type and aperture value, it calculates the equivalent aperture
  */
 
-// 传感器数据库 - 包含各种传感器尺寸和对应的裁切系数
+// Sensor database - contains various sensor sizes and their corresponding crop factors
 const SENSORS = {
   "medium-format": { cropFactor: 0.7, name: "Medium Format" },
   "full-frame": { cropFactor: 1.0, name: "Full Frame" },
@@ -42,7 +42,7 @@ const SENSORS = {
   "1/4": { cropFactor: 9.6, name: "1/4-inch" }
 };
 
-// CORS头设置 - 允许跨域请求
+// CORS headers settings - allow cross-origin requests
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -51,22 +51,30 @@ const corsHeaders = {
 };
 
 /**
- * 计算不同焦距下的等效传感器和等效光圈
- * @param {string} originalSensorId - 原始传感器ID
- * @param {number} originalFocalLength - 原始焦距(mm)
- * @param {number} newFocalLength - 新焦距(mm)
- * @param {number} aperture - 光圈值
- * @returns {Object} - 计算结果
+ * Calculate equivalent sensor and aperture at different focal lengths
+ * @param {string} originalSensorId - Original sensor ID
+ * @param {number} originalFocalLength - Original focal length (mm)
+ * @param {number} newFocalLength - New focal length (mm)
+ * @param {number} aperture - Aperture value
+ * @returns {Object} - Calculation results
  */
 function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFocalLength, aperture) {
-  // 获取原始传感器的裁切系数
+  // Get the crop factor of the original sensor
   const originalCropFactor = SENSORS[originalSensorId].cropFactor;
   
-  // 计算新的等效裁切系数
-  const newCropFactor = parseFloat((originalCropFactor * (originalFocalLength / newFocalLength)).toFixed(2));
+  // Calculate the actual sensor area ratio used in digital zoom
+  // In digital zoom, only the central part of the sensor is used, and the area ratio is the square of the focal length ratio
+  const areaRatio = (newFocalLength / originalFocalLength) ** 2;
   
-  // 找到最接近的传感器
-  let closestSensor = null;
+  // Calculate the new equivalent crop factor: original crop factor * digital zoom ratio
+  const newCropFactor = parseFloat((originalCropFactor * (newFocalLength / originalFocalLength)).toFixed(2));
+  
+  // Find the closest matching sensor
+  let closestSensor = {
+    id: "",
+    name: "",
+    cropFactor: 0
+  };
   let minDifference = Infinity;
   
   for (const [sensorId, sensorData] of Object.entries(SENSORS)) {
@@ -81,24 +89,38 @@ function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFoc
     }
   }
   
-  // 计算等效光圈
-  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(2));
+  // Calculate the current actual equivalent sensor size
+  // Formatted as "1/1.52", etc., based on the original sensor size and zoom ratio
+  let effectiveSensorSize;
+  if (originalSensorId.startsWith("1/")) {
+    // If the original sensor is in the 1/x format
+    const originalDenominator = parseFloat(originalSensorId.substring(2));
+    const newDenominator = originalDenominator * Math.sqrt(areaRatio);
+    effectiveSensorSize = `1/${newDenominator.toFixed(2)}`;
+  } else {
+    // For other sensor size formats, directly use closestSensor
+    effectiveSensorSize = closestSensor.name;
+  }
   
-  // 计算视角变化百分比
-  // 例如：从50mm到35mm，视角变化为 (1 - 35/50) * 100 = 30%，表示视角增加了30%
-  const angleOfViewChange = parseFloat((1 - (newFocalLength / originalFocalLength)) * 100).toFixed(1);
+  // Calculate equivalent aperture
+  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(1));
   
-  // 计算感光面积相对变化
-  const relativeSensorArea = parseFloat(((originalCropFactor / newCropFactor) ** 2).toFixed(2));
+  // Calculate percentage change in angle of view
+  // Example: From 50mm to 35mm, the change is (1 - 35/50) * 100 = 30%, which means angle of view increased by 30%
+  const angleOfViewChange = ((1 - (Number(newFocalLength) / Number(originalFocalLength))) * 100).toFixed(1);
   
-  // 计算等效焦距（相对于全画幅）
+  // Calculate relative sensor area change (1/zoom area ratio)
+  const relativeSensorArea = parseFloat((1 / areaRatio).toFixed(2));
+  
+  // Calculate equivalent focal length (relative to full frame)
   const originalEquivalentFocalLength = parseFloat((originalFocalLength * originalCropFactor).toFixed(1));
   const newEquivalentFocalLength = parseFloat((newFocalLength * newCropFactor).toFixed(1));
   
-  // 返回结果
+  // Return results
   return {
     exactCropFactor: newCropFactor,
     closestSensor: closestSensor,
+    effectiveSensorSize: effectiveSensorSize,
     cropFactorDifference: parseFloat(minDifference.toFixed(3)),
     equivalentAperture: equivalentAperture,
     originalFocalLength: originalFocalLength,
@@ -108,22 +130,23 @@ function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFoc
       name: SENSORS[originalSensorId].name,
       cropFactor: originalCropFactor
     },
-    angleOfViewChange: `${angleOfViewChange}%`,
+    angleOfViewChange: angleOfViewChange + "%",
     relativeSensorArea: relativeSensorArea,
+    areaRatio: parseFloat(areaRatio.toFixed(2)),
     originalEquivalentFocalLength: originalEquivalentFocalLength,
     newEquivalentFocalLength: newEquivalentFocalLength
   };
 }
 
 /**
- * 处理API请求的主函数
+ * Main function to handle API requests
  */
 async function handleRequest(request) {
-  // 添加健康检查端点
+  // Add health check endpoint
   const url = new URL(request.url);
   const path = url.pathname;
   
-  // 处理健康检查
+  // Handle health check
   if (path === "/health" || path === "/") {
     return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
       headers: {
@@ -133,17 +156,17 @@ async function handleRequest(request) {
     });
   }
   
-  // 处理OPTIONS预检请求
+  // Handle OPTIONS preflight requests
   if (request.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // 调试信息：记录请求详情
+  // Debug info: log request details
   console.log("Request URL:", request.url);
   console.log("Request method:", request.method);
   console.log("Request path:", path);
   
-  // 检查是否是等效传感器计算请求
+  // Check if this is an equivalent sensor calculation request
   if (path === "/focal-equiv" || path === "/focal-equivalent") {
     const originalSensorId = url.searchParams.get("originalSensor");
     const originalFocalLength = parseFloat(url.searchParams.get("originalFocal"));
@@ -157,7 +180,7 @@ async function handleRequest(request) {
       aperture 
     });
     
-    // 验证参数
+    // Validate parameters
     if (!originalSensorId || !SENSORS[originalSensorId]) {
       return new Response(
         JSON.stringify({ error: "Invalid original sensor size" }),
@@ -186,7 +209,7 @@ async function handleRequest(request) {
       );
     }
     
-    // 计算等效传感器和光圈
+    // Calculate equivalent sensor and aperture
     const result = calculateEquivalentSensor(
       originalSensorId,
       originalFocalLength,
@@ -197,14 +220,14 @@ async function handleRequest(request) {
     return new Response(JSON.stringify(result), { headers: corsHeaders });
   }
   
-  // 常规光圈等效计算
-  // 获取传感器类型和光圈值参数
+  // Regular aperture equivalent calculation
+  // Get sensor type and aperture value parameters
   const sensorSize = url.searchParams.get("sensorSize");
   const aperture = parseFloat(url.searchParams.get("aperture"));
   
   console.log("Aperture Equiv Params:", { sensorSize, aperture });
 
-  // 验证参数
+  // Validate parameters
   if (!sensorSize || !SENSORS[sensorSize]) {
     return new Response(
       JSON.stringify({ error: "Invalid sensor size" }),
@@ -219,13 +242,13 @@ async function handleRequest(request) {
     );
   }
 
-  // 获取传感器裁切系数
+  // Get sensor crop factor
   const cropFactor = SENSORS[sensorSize].cropFactor;
   
-  // 计算等效光圈
-  const equivalentAperture = parseFloat((aperture * cropFactor).toFixed(2));
+  // Calculate equivalent aperture
+  const equivalentAperture = parseFloat((aperture * cropFactor).toFixed(1));
 
-  // 返回计算结果
+  // Return calculation results
   const result = {
     sensorSize: SENSORS[sensorSize].name,
     sensorId: sensorSize,
@@ -237,7 +260,7 @@ async function handleRequest(request) {
   return new Response(JSON.stringify(result), { headers: corsHeaders });
 }
 
-// 注册Worker的fetch事件处理程序
+// Register the Worker's fetch event handler
 addEventListener("fetch", event => {
   event.respondWith(handleRequest(event.request));
 });
