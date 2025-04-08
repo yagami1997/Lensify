@@ -1,86 +1,142 @@
-# Lensify - Sensor & Aperture Calculator
+# Lensify
 
-"Lensify is an online sensor and aperture calculator designed to help photographers and engineers quickly compute equivalent aperture values based on different sensor sizes, providing a seamless tool for lens optimization and sensor comparison.
+A comprehensive calculator for photographers and cinematographers to compute sensor size relationships, equivalent apertures, and focal length effects. Built with Cloudflare Workers and Pages, Lensify helps you understand the impact of different sensor sizes on your imaging.
 
-A web-based calculator for determining equivalent aperture values across different sensor sizes. Built with Cloudflare Workers and Cloudflare Pages.
+## Overview
 
-## Project Structure
-
-```
-lensify/
-├── worker.js                # Cloudflare Worker code
-├── public/                  # Static files for Cloudflare Pages
-│   ├── index.html           # Main HTML file
-│   ├── malibu.css           # CSS styles
-│   └── sanfrancisco.js      # JavaScript frontend logic
-└── README.md                # This file
-```
+Lensify solves several common challenges in photography and cinematography:
+- Calculate equivalent aperture values across different sensor sizes
+- Determine the effective sensor size when using partial sensor readout
+- Compute perspective and field of view changes when switching focal lengths
+- Find equivalent focal lengths between different sensor formats
 
 ## Features
 
-- Calculate equivalent aperture based on sensor size and input aperture
-- Support for a wide range of sensor sizes from medium format to tiny smartphone sensors
-- Clean, responsive user interface
-- Serverless architecture using Cloudflare
+- **Sensor Size Calculations**
+  - Support for 30+ sensor formats from Medium Format to 1/4-inch
+  - Accurate crop factor calculations
+  - Equivalent sensor size determination
+  
+- **Aperture Equivalence**
+  - F-stop conversion between sensor formats
+  - Depth of field equivalence calculations
+  - Real-world light gathering comparisons
+  
+- **Focal Length Analysis**
+  - Field of view changes
+  - Perspective compression/expansion effects
+  - Equivalent focal length matching
 
-## Deployment Instructions
+- **Modern Architecture**
+  - Serverless deployment on Cloudflare
+  - Fast, responsive interface
+  - Global edge network distribution
 
-### 1. Deploy the Cloudflare Worker
+## Deployment Guide
 
-1. Log in to your Cloudflare dashboard at https://dash.cloudflare.com
-2. Navigate to "Workers & Pages"
-3. Click "Create application" and select "Create Worker"
-4. Give your worker a name (e.g., "lensify-calculator")
-5. Paste the contents of `worker.js` into the editor
-6. Click "Save and Deploy"
-7. Note your worker's URL (e.g., `https://lensify-calculator.your-worker-subdomain.workers.dev`)
+### 1. Fork and Clone
+```bash
+git clone https://github.com/yourusername/Lensify.git
+cd Lensify
+```
 
-### 2. Update the API URL in Frontend Code
+### 2. Deploy the Worker
 
-1. Open `public/sanfrancisco.js`
-2. Update the `API_URL` constant with your Worker URL:
-   ```javascript
-   const API_URL = "https://lensify-calculator.your-worker-subdomain.workers.dev";
+1. Copy the worker template:
+   ```bash
+   cp worker.example.js worker.js
    ```
 
-### 3. Deploy to Cloudflare Pages
+2. Edit `worker.js`:
+   - Replace `example.pages.dev` with your Pages domain
+   - Save the file
 
-1. From your Cloudflare dashboard, go to "Workers & Pages"
-2. Click "Create application" and select "Pages"
-3. Set up your deployment method (connect to Git repository or direct upload)
-4. For direct upload:
-   - Select "Upload Assets"
-   - Upload the contents of the `public` directory
-5. Configure your build settings if using Git:
-   - Build command: (leave blank for direct upload)
+3. Deploy to Cloudflare Workers:
+   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
+   - Navigate to "Workers & Pages" → "Create Application"
+   - Choose "Create Worker"
+   - Name your worker (e.g., "lensify-calculator")
+   - Paste your modified `worker.js` content
+   - Click "Save and Deploy"
+
+### 3. Deploy the Frontend
+
+1. Configure your Pages project:
+   - In Cloudflare Dashboard, go to "Workers & Pages"
+   - Click "Create Application" → "Pages"
+   - Connect your GitHub repository or upload directly
+   
+2. Build Settings:
+   - Build command: (leave empty for direct upload)
    - Build output directory: `public`
-6. Click "Save and Deploy"
+   - Environment variables: (none required)
 
-## Customization
+3. Deploy:
+   - Click "Save and Deploy"
+   - Wait for the deployment to complete
+   - Note your Pages URL (e.g., `https://your-project.pages.dev`)
 
-### Adding New Sensor Sizes
+## Usage Guide
 
-To add new sensor sizes, update the `SENSORS` object in `worker.js`:
+### Basic Aperture Calculation
+1. Select your sensor size (e.g., "APS-C")
+2. Enter your aperture value (e.g., "f/2.8")
+3. Get the full-frame equivalent aperture
 
+### Advanced Focal Length Comparison
+1. Choose your original sensor size
+2. Enter original focal length
+3. Enter new focal length
+4. Input aperture value
+5. View comprehensive results:
+   - Equivalent aperture
+   - Field of view change
+   - Perspective effect
+   - Effective sensor size
+
+### Example Calculations
+
+1. **APS-C to Full Frame**
+   - Original: f/2.8 on APS-C
+   - Result: f/4.2 equivalent on Full Frame
+   
+2. **Focal Length Change**
+   - 50mm to 85mm on Full Frame
+   - Results in 70% perspective compression
+   - -41.2% narrower field of view
+
+## API Documentation
+
+### Endpoint: /api/calculate
+Calculate basic aperture equivalence
 ```javascript
-const SENSORS = {
-  // Add your new sensor here
-  "new-sensor-id": { cropFactor: 1.23, name: "New Sensor Name" },
-  // Existing sensors...
-};
+GET /api/calculate?sensorSize=aps-c&aperture=2.8
 ```
 
-Then add the corresponding option to the select element in `public/index.html`:
-
-```html
-<option value="new-sensor-id">New Sensor Name</option>
+### Endpoint: /api/focal-equivalent
+Calculate comprehensive focal length effects
+```javascript
+GET /api/focal-equiv?originalSensor=full-frame&originalFocal=50&newFocal=85&aperture=2.8
 ```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
-[MIT License](LICENSE)
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
-## Credits
+## Acknowledgments
 
-- Developed as part of the Lensify project
-- Powered by Cloudflare Workers and Pages
+- Built with Cloudflare Workers and Pages
+- Inspired by the needs of photographers and cinematographers
+- Special thanks to the photography community for feedback and testing
+
+## Support
+
+For issues and feature requests, please use the GitHub issues page.
