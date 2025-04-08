@@ -140,8 +140,21 @@ function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFoc
   const equivalentAperture = safeFormattedNumber(apertureVal * newCropFactor, 1);
   
   // Calculate percentage change in angle of view
+  // This formula calculates how much wider or narrower the field of view becomes
+  // when changing from the original focal length to the new focal length.
+  // Example: Moving from 50mm to 35mm widens the view by (1 - (35/50)) * 100 = 30%
+  // A positive percentage means a wider view, while negative means a narrower view.
   const angleOfViewChangeValue = safeFormattedNumber((1 - (newFocalLen / origFocalLen)) * 100, 1);
   const angleOfViewChange = `${angleOfViewChangeValue}%`;
+  
+  // Calculate perspective change (when maintaining same framing by changing distance)
+  // This calculates how perspective changes when you maintain the same subject size
+  // by adjusting your distance when changing focal lengths
+  // Example: Moving from 50mm to 85mm while maintaining framing requires stepping back,
+  // resulting in perspective compression of (85/50 - 1) * 100 = 70%
+  // Positive values indicate compression, negative values indicate expansion
+  const perspectiveChangeValue = safeFormattedNumber((newFocalLen / origFocalLen - 1) * 100, 1);
+  const perspectiveChange = `${perspectiveChangeValue}%`;
   
   // Calculate relative sensor area change
   const relativeSensorArea = safeFormattedNumber(1 / areaRatio, 2);
@@ -165,6 +178,7 @@ function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFoc
       cropFactor: originalCropFactor
     },
     angleOfViewChange: angleOfViewChange,
+    perspectiveChange: perspectiveChange,
     relativeSensorArea: relativeSensorArea,
     areaRatio: safeFormattedNumber(areaRatio, 2),
     originalEquivalentFocalLength: originalEquivalentFocalLength,
