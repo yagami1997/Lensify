@@ -51,6 +51,41 @@ const corsHeaders = {
 };
 
 /**
+ * Safe conversion to number with fallback to default
+ * @param {any} value - Value to convert
+ * @param {number} defaultValue - Default value if conversion fails
+ * @returns {number} - Converted number or default
+ */
+function safeNumber(value, defaultValue = 0) {
+  if (value === null || value === undefined) return defaultValue;
+  const num = Number(value);
+  return isNaN(num) ? defaultValue : num;
+}
+
+/**
+ * Safe conversion to formatted number with decimal places
+ * @param {any} value - Value to convert
+ * @param {number} decimals - Number of decimal places
+ * @param {number} defaultValue - Default value if conversion fails
+ * @returns {number} - Formatted number
+ */
+function safeFormattedNumber(value, decimals = 1, defaultValue = 0) {
+  const num = safeNumber(value, defaultValue);
+  return Number(num.toFixed(decimals));
+}
+
+/**
+ * Safe conversion to string with fallback to default
+ * @param {any} value - Value to convert
+ * @param {string} defaultValue - Default value if conversion fails
+ * @returns {string} - Converted string or default
+ */
+function safeString(value, defaultValue = "") {
+  if (value === null || value === undefined) return defaultValue;
+  return String(value);
+}
+
+/**
  * Calculate equivalent sensor and aperture at different focal lengths
  * @param {string} originalSensorId - Original sensor ID
  * @param {number} originalFocalLength - Original focal length (mm)
@@ -59,91 +94,79 @@ const corsHeaders = {
  * @returns {Object} - Calculation results
  */
 function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFocalLength, aperture) {
-  // Ensure all numeric inputs are properly converted to numbers and have correct types
-  const origFocalLen = Number(originalFocalLength);
-  const newFocalLen = Number(newFocalLength);
-  const apertureVal = Number(parseFloat(aperture).toFixed(1)); // Format aperture to one decimal place
-  
-  // Ensure originalSensorId is a string
-  const sensorId = String(originalSensorId);
+  // Ensure all inputs have correct types
+  const sensorId = safeString(originalSensorId);
+  const origFocalLen = safeNumber(originalFocalLength, 1);
+  const newFocalLen = safeNumber(newFocalLength, 1);
+  const apertureVal = safeFormattedNumber(aperture, 1, 1);
   
   // Get the crop factor of the original sensor
-  const originalCropFactor = SENSORS[sensorId]?.cropFactor || 1.0;
+  const sensorData = SENSORS[sensorId];
+  const originalCropFactor = sensorData ? safeNumber(sensorData.cropFactor, 1) : 1;
   
   // Calculate the actual sensor area ratio used in digital zoom
-  // In digital zoom, only the central part of the sensor is used, and the area ratio is the square of the focal length ratio
   const areaRatio = (newFocalLen / origFocalLen) ** 2;
   
-  // Calculate the new equivalent crop factor: original crop factor * digital zoom ratio
-  const newCropFactor = Number(((originalCropFactor * (newFocalLen / origFocalLen)).toFixed(2)));
+  // Calculate the new equivalent crop factor
+  const newCropFactor = safeFormattedNumber(originalCropFactor * (newFocalLen / origFocalLen), 2);
   
   // Find the closest matching sensor
-  let closestSensor = {
-    id: "",
-    name: "",
-    cropFactor: 0
-  };
+  let closestSensor = { id: "", name: "", cropFactor: 0 };
   let minDifference = Infinity;
   
-  for (const [sensorId, sensorData] of Object.entries(SENSORS)) {
-    const difference = Math.abs(sensorData.cropFactor - newCropFactor);
+  for (const [id, data] of Object.entries(SENSORS)) {
+    const difference = Math.abs(data.cropFactor - newCropFactor);
     if (difference < minDifference) {
       minDifference = difference;
       closestSensor = {
-        id: sensorId,
-        name: String(sensorData.name),
-        cropFactor: Number(sensorData.cropFactor)
+        id: safeString(id),
+        name: safeString(data.name),
+        cropFactor: safeNumber(data.cropFactor)
       };
     }
   }
   
   // Calculate the current actual equivalent sensor size
-  // Formatted as "1/1.52", etc., based on the original sensor size and zoom ratio
   let effectiveSensorSize = "";
   if (sensorId.startsWith("1/")) {
-    // If the original sensor is in the 1/x format
-    const originalDenominator = Number(sensorId.substring(2));
+    const originalDenominator = safeNumber(sensorId.substring(2), 1);
     const newDenominator = originalDenominator * Math.sqrt(areaRatio);
-    effectiveSensorSize = `1/${newDenominator.toFixed(2)}`;
-  } else if (closestSensor && typeof closestSensor.name === 'string') {
-    // For other sensor size formats, directly use closestSensor
-    effectiveSensorSize = String(closestSensor.name);
+    effectiveSensorSize = `1/${safeFormattedNumber(newDenominator, 2)}`;
   } else {
-    // Fallback if closestSensor is not properly initialized
-    effectiveSensorSize = "Unknown";
+    effectiveSensorSize = safeString(closestSensor.name, "Unknown");
   }
   
-  // Calculate equivalent aperture with exactly one decimal place
-  const equivalentAperture = Number(parseFloat(apertureVal * newCropFactor).toFixed(1));
+  // Calculate equivalent aperture
+  const equivalentAperture = safeFormattedNumber(apertureVal * newCropFactor, 1);
   
   // Calculate percentage change in angle of view
-  // Example: From 50mm to 35mm, the change is (1 - 35/50) * 100 = 30%, which means angle of view increased by 30%
-  const angleOfViewChange = String(((1 - (newFocalLen / origFocalLen)) * 100).toFixed(1));
+  const angleOfViewChangeValue = safeFormattedNumber((1 - (newFocalLen / origFocalLen)) * 100, 1);
+  const angleOfViewChange = `${angleOfViewChangeValue}%`;
   
-  // Calculate relative sensor area change (1/zoom area ratio)
-  const relativeSensorArea = Number((1 / areaRatio).toFixed(2));
+  // Calculate relative sensor area change
+  const relativeSensorArea = safeFormattedNumber(1 / areaRatio, 2);
   
-  // Calculate equivalent focal length (relative to full frame)
-  const originalEquivalentFocalLength = Number((origFocalLen * originalCropFactor).toFixed(1));
-  const newEquivalentFocalLength = Number((newFocalLen * newCropFactor).toFixed(1));
+  // Calculate equivalent focal lengths
+  const originalEquivalentFocalLength = safeFormattedNumber(origFocalLen * originalCropFactor, 1);
+  const newEquivalentFocalLength = safeFormattedNumber(newFocalLen * newCropFactor, 1);
   
   // Return results
   return {
     exactCropFactor: newCropFactor,
     closestSensor: closestSensor,
     effectiveSensorSize: effectiveSensorSize,
-    cropFactorDifference: Number(minDifference.toFixed(3)),
+    cropFactorDifference: safeFormattedNumber(minDifference, 3),
     equivalentAperture: equivalentAperture,
     originalFocalLength: origFocalLen,
     newFocalLength: newFocalLen,
     originalSensor: {
       id: sensorId,
-      name: String(SENSORS[sensorId]?.name || "Unknown"),
+      name: sensorData ? safeString(sensorData.name) : "Unknown",
       cropFactor: originalCropFactor
     },
-    angleOfViewChange: angleOfViewChange + "%",
+    angleOfViewChange: angleOfViewChange,
     relativeSensorArea: relativeSensorArea,
-    areaRatio: Number(areaRatio.toFixed(2)),
+    areaRatio: safeFormattedNumber(areaRatio, 2),
     originalEquivalentFocalLength: originalEquivalentFocalLength,
     newEquivalentFocalLength: newEquivalentFocalLength
   };
@@ -179,14 +202,10 @@ async function handleRequest(request) {
   
   // Check if this is an equivalent sensor calculation request
   if (path === "/focal-equiv" || path === "/focal-equivalent") {
-    const originalSensorId = String(url.searchParams.get("originalSensor") || "");
-    const originalFocalValue = url.searchParams.get("originalFocal");
-    const newFocalValue = url.searchParams.get("newFocal");
-    const apertureValue = url.searchParams.get("aperture");
-    
-    const originalFocalLength = originalFocalValue ? Number(originalFocalValue) : 0;
-    const newFocalLength = newFocalValue ? Number(newFocalValue) : 0;
-    const aperture = apertureValue ? Number(apertureValue) : 0;
+    const originalSensorId = safeString(url.searchParams.get("originalSensor"));
+    const originalFocalLength = safeNumber(url.searchParams.get("originalFocal"));
+    const newFocalLength = safeNumber(url.searchParams.get("newFocal"));
+    const aperture = safeNumber(url.searchParams.get("aperture"));
     
     console.log("Focal Equiv Params:", { 
       originalSensorId, 
@@ -203,21 +222,21 @@ async function handleRequest(request) {
       );
     }
     
-    if (isNaN(originalFocalLength) || originalFocalLength <= 0) {
+    if (originalFocalLength <= 0) {
       return new Response(
         JSON.stringify({ error: "Invalid original focal length" }),
         { status: 400, headers: corsHeaders }
       );
     }
     
-    if (isNaN(newFocalLength) || newFocalLength <= 0) {
+    if (newFocalLength <= 0) {
       return new Response(
         JSON.stringify({ error: "Invalid new focal length" }),
         { status: 400, headers: corsHeaders }
       );
     }
     
-    if (isNaN(aperture) || aperture <= 0) {
+    if (aperture <= 0) {
       return new Response(
         JSON.stringify({ error: "Invalid aperture value" }),
         { status: 400, headers: corsHeaders }
@@ -237,9 +256,8 @@ async function handleRequest(request) {
   
   // Regular aperture equivalent calculation
   // Get sensor type and aperture value parameters
-  const sensorSize = String(url.searchParams.get("sensorSize") || "");
-  const apertureValue = url.searchParams.get("aperture");
-  const aperture = apertureValue ? Number(apertureValue) : 0;
+  const sensorSize = safeString(url.searchParams.get("sensorSize"));
+  const aperture = safeNumber(url.searchParams.get("aperture"));
   
   console.log("Aperture Equiv Params:", { sensorSize, aperture });
 
@@ -251,25 +269,24 @@ async function handleRequest(request) {
     );
   }
 
-  if (isNaN(aperture) || aperture <= 0) {
+  if (aperture <= 0) {
     return new Response(
       JSON.stringify({ error: "Invalid aperture value" }),
       { status: 400, headers: corsHeaders }
     );
   }
 
-  // Get sensor crop factor
-  const cropFactor = Number(SENSORS[sensorSize]?.cropFactor || 1.0);
-  
-  // Calculate equivalent aperture - ensure it's formatted with exactly one decimal place
-  const equivalentAperture = Number(parseFloat(aperture * cropFactor).toFixed(1));
+  // Get sensor crop factor and calculate equivalent aperture
+  const sensorData = SENSORS[sensorSize];
+  const cropFactor = safeNumber(sensorData.cropFactor, 1);
+  const equivalentAperture = safeFormattedNumber(aperture * cropFactor, 1);
 
   // Return calculation results
   const result = {
-    sensorSize: String(SENSORS[sensorSize]?.name || "Unknown"),
+    sensorSize: safeString(sensorData.name),
     sensorId: sensorSize,
     cropFactor: cropFactor,
-    inputAperture: Number(parseFloat(aperture).toFixed(1)), // Format input aperture to one decimal place
+    inputAperture: safeFormattedNumber(aperture, 1),
     equivalentAperture: equivalentAperture
   };
 

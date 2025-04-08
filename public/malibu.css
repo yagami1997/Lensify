@@ -1,8 +1,7 @@
-/* 
- * Malibu CSS - Lensify项目样式表
+/**
+ * Malibu CSS - Lensify Styles
  * 
- * 这个样式表定义了Lensify计算器的视觉外观
- * 采用加州阳光风格的设计
+ * This stylesheet defines the visual appearance of the Lensify calculator
  */
 
 :root {
@@ -134,7 +133,7 @@ select.form-control {
   background-color: var(--sand-beige);
 }
 
-/* 光圈输入前缀样式 */
+/* Aperture input prefix style */
 .input-prefix {
   position: relative;
   display: flex;
@@ -306,11 +305,11 @@ input[type="number"] {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 焦距计算器特定样式 */
+/* Focal length calculator specific styles */
 .focal-length-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: 1rem;
 }
 
 .result-section {
