@@ -194,7 +194,7 @@ async function handleApiRequest(request) {
   const path = url.pathname;
 
   // Handle API health check
-  if (path === "/api/health") {
+  if (path === "/api/health" || path === "/api") {
     return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
       headers: {
         ...corsHeaders,
@@ -300,9 +300,10 @@ async function handleApiRequest(request) {
  */
 async function handleRequest(request) {
   const url = new URL(request.url);
+  const path = url.pathname;
   
   // API endpoints
-  if (url.pathname.startsWith('/api/')) {
+  if (path === "/api" || path.startsWith('/api/')) {
     return handleApiRequest(request);
   }
 

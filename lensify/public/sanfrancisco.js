@@ -472,6 +472,7 @@ async function checkApiConnection() {
     // 尝试几种不同的URL格式
     const urlFormats = [
       `${API_URL}/health`,
+      `${API_URL}`,
       `${FALLBACK_URL}/health`
     ];
     
