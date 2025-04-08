@@ -1,12 +1,12 @@
-# Lensify 📷 ✨
-
 <div align="center">
 
-![License](https://img.shields.io/badge/License-GPL_v3-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Cloudflare_Workers-orange)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
-![CSS](https://img.shields.io/badge/CSS-Custom-blueviolet)
-![Status](https://img.shields.io/badge/status-active-success)
+# Lensify 📷 ✨
+
+License: ![GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg) | 
+platform: ![Cloudflare Workers](https://img.shields.io/badge/platform-Cloudflare_Workers-orange) | 
+JavaScript: ![ES6](https://img.shields.io/badge/JavaScript-ES6-yellow) | 
+CSS: ![Custom](https://img.shields.io/badge/CSS-Custom-blueviolet) | 
+status: ![active](https://img.shields.io/badge/status-active-success)
 
 **Precision tools for photographers and filmmakers - anywhere, anytime**
 
@@ -14,18 +14,31 @@
 
 </div>
 
+<div align="center">
+
 ## 🌟 Overview
 
-Lensify is a comprehensive calculator that helps photographers and cinematographers understand the complex relationships between sensor sizes, focal lengths, and apertures. Whether you're switching between cameras with different sensors or exploring the impact of changing lenses, Lensify provides precise calculations to help you visualize the results.
+</div>
 
+<div align="center">
+Lensify is a comprehensive calculator that helps photographers and cinematographers understand the complex relationships between sensor sizes, focal lengths, and apertures. Whether you're switching between cameras with different sensors or exploring the impact of changing lenses, Lensify provides precise calculations to help you visualize the results.
+</div>
+
+<div align="center">
 Perfect for:
+</div>
+
 - Professional photographers comparing equipment across platforms
 - Filmmakers planning shots with various camera systems
 - Smartphone photographers exploring the capabilities of mobile sensors
 - Photography educators explaining sensor and lens relationships
 - Digital nomads who need reliable creative tools on the go
 
+<div align="center">
+
 ## ✨ Features
+
+</div>
 
 ### 📐 Sensor Size Calculations
 - Support for **30+ sensor formats** from Medium Format to smartphone 1/4-inch sensors
@@ -48,7 +61,11 @@ Perfect for:
 - **Deployment**: Cloudflare Pages
 - **Offline Support**: Local calculation fallbacks when API is unavailable
 
+<div align="center">
+
 ## 💻 Technical Implementation
+
+</div>
 
 ### Architecture Overview
 
@@ -61,7 +78,11 @@ Lensify follows a hybrid architecture that balances serverless computing with cl
 
 This architecture enables Lensify to be both lightweight and powerful, with almost zero maintenance costs.
 
+<div align="center">
+
 ## 📋 Documentation
+
+</div>
 
 ### Using the Calculators
 
@@ -93,7 +114,11 @@ Understand what happens when you change focal lengths:
 | Focal Length Change | 50mm to 85mm on Full Frame | 70% perspective compression, -41.2% narrower field of view |
 | Smartphone Camera | f/1.8 on 1/1.7-inch sensor | f/8.1 equivalent on Full Frame |
 
+<div align="center">
+
 ## 🔧 Installation & Deployment
+
+</div>
 
 Lensify uses Cloudflare's developer platform for fast, global deployment. Follow these steps to deploy your own instance:
 
@@ -153,7 +178,11 @@ cd public
 wrangler pages publish .
 ```
 
+<div align="center">
+
 ## 🌐 API Documentation
+
+</div>
 
 Lensify provides a simple REST API for calculations:
 
@@ -206,22 +235,38 @@ Response:
 }
 ```
 
+<div align="center">
+
 ## 🌈 Experience It Live
 
 Try Lensify now: [https://lensify.pages.dev/](https://lensify.pages.dev/)
 
+</div>
+
+<div align="center">
+
 ## 🔄 Offline Mode
+
+</div>
 
 Lensify automatically works offline by performing calculations locally when the API is unavailable. This makes it reliable for use in remote locations, on sets with poor connectivity, or when you're traveling.
 
+<div align="center">
+
 ## 📱 Responsive Design
+
+</div>
 
 Lensify is designed to work beautifully on any device:
 - **Desktop**: Expanded interface with side-by-side results
 - **Tablet**: Comfortable touch targets for field use
 - **Mobile**: Fully responsive design for on-the-go calculations
 
+<div align="center">
+
 ## 🤝 Contributing
+
+</div>
 
 Contributions are welcome! To contribute:
 
@@ -231,11 +276,19 @@ Contributions are welcome! To contribute:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+<div align="center">
+
 ## 📜 License
+
+</div>
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
+<div align="center">
+
 ## 🙏 Acknowledgments
+
+</div>
 
 - Built with Cloudflare Workers and Pages
 - Inspired by the needs of photographers and cinematographers worldwide
