@@ -5,50 +5,30 @@ name = "lensify-calculator"
 main = "worker.js"
 compatibility_date = "2023-05-18"
 
-# Trigger Configuration
-# Capture all path requests
+# Routes Configuration
 [triggers]
 routes = [
-  { pattern = "example.com/*", zone_name = "example.com" }
+  { pattern = "lensify-calculator.yagami1997.workers.dev/*", zone_name = "workers.dev" }
 ]
 
 # SSL Configuration
 [ssl]
 certificate_mode = "managed_by_cloudflare"
 
-# Example: Bind Worker to /api/calculate path on main domain
-# routes = [
-#   { pattern = "example.com/api/calculate*", zone_name = "example.com" }
-# ]
-
-# Example: Bind Worker to dedicated calculator subdomain
-# routes = [
-#   { pattern = "calculator.example.com/*", zone_name = "example.com" }
-# ]
-
-# Example: Capture multiple paths
-# routes = [
-#   { pattern = "example.com/tools/lensify/*", zone_name = "example.com" },
-#   { pattern = "api.example.com/v1/calculate*", zone_name = "example.com" }
-# ]
-
-# Cloudflare Pages Configuration
-# Note: For Pages, use pages_build_output_dir instead of bucket
-pages_build_output_dir = "lensify/public"
-
-# File Exclusion Configuration
+# Build Configuration
 [build]
 upload.exclude = [
-  "../Plan.md",
-  "Plan.md",
   "*.md",
   "LICENSE",
-  "node_modules",
   ".git",
   ".gitignore",
   ".DS_Store",
   "Thumbs.db"
 ]
+
+# Cloudflare Pages Configuration
+# Note: For Pages, use pages_build_output_dir instead of bucket
+pages_build_output_dir = "lensify/public"
 
 # Environment Variables Example
 # [vars]
