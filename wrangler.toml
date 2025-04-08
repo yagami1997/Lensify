@@ -29,6 +29,11 @@ routes = [
 #   { pattern = "api.example.com/v1/calculate*", zone_name = "example.com" }
 # ]
 
+# Cloudflare Pages 配置
+[site]
+bucket = "./public"  # 指定静态资源目录
+entry-point = "."   # Worker脚本位置
+
 # 排除文件配置
 [build]
 upload.exclude = [

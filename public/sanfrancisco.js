@@ -44,32 +44,59 @@ const tabFocal = document.getElementById("tab-focal");
  * 初始化页面交互
  */
 function initializeApp() {
+  console.log("Initializing app...");
+  
+  // 首先检查DOM元素是否存在
+  if (!sensorSelect || !apertureInput || !calculateButton) {
+    console.error("Missing essential DOM elements for aperture calculator");
+    return;
+  }
+  
   // 添加计算按钮点击事件
   calculateButton.addEventListener("click", calculateEquivalentAperture);
-  calculateFocalButton.addEventListener("click", calculateFocalEquivalent);
   
-  // 添加标签页切换事件
-  tabButtonAperture.addEventListener("click", () => switchTab("aperture"));
-  tabButtonFocal.addEventListener("click", () => switchTab("focal"));
+  // 检查焦距计算器元素是否存在
+  const hasFocalTab = tabButtonFocal && tabButtonAperture && tabAperture && tabFocal && 
+                      originalSensorSelect && originalFocalInput && newFocalInput && 
+                      focalApertureInput && calculateFocalButton;
   
-  // 添加键盘事件 - 按Enter键时触发计算
+  if (hasFocalTab) {
+    console.log("Focal length tab elements found, initializing...");
+    
+    // 添加焦距计算功能
+    calculateFocalButton.addEventListener("click", calculateFocalEquivalent);
+    
+    // 添加标签页切换事件
+    tabButtonAperture.addEventListener("click", () => switchTab("aperture"));
+    tabButtonFocal.addEventListener("click", () => switchTab("focal"));
+    
+    // 添加键盘事件 - 焦距计算器
+    focalApertureInput.addEventListener("keyup", function(event) {
+      if (event.key === "Enter") {
+        calculateFocalEquivalent();
+      }
+    });
+    
+    // 添加输入验证 - 焦距计算器
+    focalApertureInput.addEventListener("input", validateApertureInput);
+    originalFocalInput.addEventListener("input", validateFocalLengthInput);
+    newFocalInput.addEventListener("input", validateFocalLengthInput);
+    
+    // 初始化时默认显示光圈计算器标签页
+    switchTab("aperture");
+  } else {
+    console.warn("Focal length calculator elements not found, using aperture calculator only mode");
+  }
+  
+  // 添加键盘事件 - 光圈计算器
   apertureInput.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
       calculateEquivalentAperture();
     }
   });
   
-  focalApertureInput.addEventListener("keyup", function(event) {
-    if (event.key === "Enter") {
-      calculateFocalEquivalent();
-    }
-  });
-  
-  // 添加输入验证
+  // 添加输入验证 - 光圈计算器
   apertureInput.addEventListener("input", validateApertureInput);
-  focalApertureInput.addEventListener("input", validateApertureInput);
-  originalFocalInput.addEventListener("input", validateFocalLengthInput);
-  newFocalInput.addEventListener("input", validateFocalLengthInput);
   
   // 检查API连接
   checkApiConnection();
@@ -79,6 +106,14 @@ function initializeApp() {
  * 切换标签页
  */
 function switchTab(tabName) {
+  console.log(`Switching to tab: ${tabName}`);
+  
+  // 检查所有标签页元素是否存在
+  if (!tabButtonAperture || !tabButtonFocal || !tabAperture || !tabFocal) {
+    console.error("Tab elements missing, cannot switch tabs");
+    return;
+  }
+  
   // 移除所有标签页的active类
   tabButtonAperture.classList.remove("active");
   tabButtonFocal.classList.remove("active");
