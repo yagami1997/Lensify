@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lensify - Sensor & Aperture Calculator</title>
+    <link rel="stylesheet" href="malibu.css">
+    <!-- 使用Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- 添加网站图标 -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Lensify</h1>
+            <p class="subtitle">California Sunshine Edition</p>
+        </header>
+
+        <main>
+            <div id="connection-status" class="status-banner hidden">
+                <p class="status-message">Working in offline mode - calculations performed locally</p>
+            </div>
+            
+            <!-- Tab navigation -->
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button id="tab-button-aperture" class="tab-button active">Aperture Calculator</button>
+                    <button id="tab-button-focal" class="tab-button">Focal Length Calculator</button>
+                </div>
+            
+                <!-- Aperture calculator tab -->
+                <div id="tab-aperture" class="tab-content active">
+                    <div class="calculator-card">
+                        <div class="form-group">
+                            <label for="sensorSize">Select Sensor Size</label>
+                            <select id="sensorSize" class="form-control">
+                                <!-- 相机传感器选项 -->
+                                <optgroup label="Camera Sensors">
+                                    <option value="medium-format">Medium Format</option>
+                                    <option value="full-frame">Full Frame</option>
+                                    <option value="aps-h">APS-H</option>
+                                    <option value="aps-c-canon">APS-C (Canon)</option>
+                                    <option value="aps-c">APS-C</option>
+                                    <option value="micro-four-thirds">Micro Four Thirds</option>
+                                    <option value="1-inch">1-inch</option>
+                                </optgroup>
+                                
+                                <!-- 手机传感器选项 -->
+                                <optgroup label="Phone Sensors">
+                                    <option value="1/1.14">1/1.14-inch</option>
+                                    <option value="1/1.28">1/1.28-inch</option>
+                                    <option value="1/1.3">1/1.3-inch</option>
+                                    <option value="1/1.31">1/1.31-inch</option>
+                                    <option value="1/1.35">1/1.35-inch</option>
+                                    <option value="1/1.4">1/1.4-inch</option>
+                                    <option value="1/1.49">1/1.49-inch</option>
+                                    <option value="1/1.5">1/1.5-inch</option>
+                                    <option value="1/1.56">1/1.56-inch</option>
+                                    <option value="1/1.57">1/1.57-inch</option>
+                                    <option value="1/1.6">1/1.6-inch</option>
+                                    <option value="1/1.7">1/1.7-inch</option>
+                                    <option value="1/1.74">1/1.74-inch</option>
+                                    <option value="1/1.78">1/1.78-inch</option>
+                                    <option value="1/1.95">1/1.95-inch</option>
+                                    <option value="1/2">1/2-inch</option>
+                                    <option value="1/2.3">1/2.3-inch</option>
+                                    <option value="1/2.55">1/2.55-inch</option>
+                                    <option value="1/2.76">1/2.76-inch</option>
+                                    <option value="1/3">1/3-inch</option>
+                                    <option value="1/3.06">1/3.06-inch</option>
+                                    <option value="1/3.2">1/3.2-inch</option>
+                                    <option value="1/3.4">1/3.4-inch</option>
+                                    <option value="1/3.6">1/3.6-inch</option>
+                                    <option value="1/4">1/4-inch</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aperture">Enter Aperture (f-stop)</label>
+                            <div class="input-prefix">
+                                <span class="prefix">f/</span>
+                                <input type="number" id="aperture" class="form-control" step="0.1" min="0.95" value="1.8">
+                            </div>
+                        </div>
+
+                        <button id="calculate" class="btn-calculate">Calculate</button>
+
+                        <div id="result" class="result-container hidden">
+                            <h3>🌞 Result</h3>
+                            <div class="result-grid">
+                                <div class="result-item">
+                                    <span class="result-label">Sensor:</span>
+                                    <span id="result-sensor" class="result-value">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Crop Factor:</span>
+                                    <span id="result-crop-factor" class="result-value">-</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Input Aperture:</span>
+                                    <span id="result-input-aperture" class="result-value">-</span>
+                                </div>
+                                <div class="result-item highlight">
+                                    <span class="result-label">Equivalent Aperture:</span>
+                                    <span id="result-equivalent-aperture" class="result-value">-</span>
+                                </div>
+                            </div>
+                            <p class="explanation">
+                                Equivalent aperture represents the effective f-stop when comparing the depth of field to a full-frame camera. 
+                                This helps you understand how your lens performs across different sensor sizes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Focal Length Calculator tab -->
+                <div id="tab-focal" class="tab-content">
+                    <div class="calculator-card">
+                        <div class="form-group">
+                            <label for="originalSensor">Original Sensor Size</label>
+                            <select id="originalSensor" class="form-control">
+                                <!-- 相机传感器选项 -->
+                                <optgroup label="Camera Sensors">
+                                    <option value="medium-format">Medium Format</option>
+                                    <option value="full-frame">Full Frame</option>
+                                    <option value="aps-h">APS-H</option>
+                                    <option value="aps-c-canon">APS-C (Canon)</option>
+                                    <option value="aps-c">APS-C</option>
+                                    <option value="micro-four-thirds">Micro Four Thirds</option>
+                                    <option value="1-inch">1-inch</option>
+                                </optgroup>
+                                
+                                <!-- 手机传感器选项 -->
+                                <optgroup label="Phone Sensors">
+                                    <option value="1/1.14">1/1.14-inch</option>
+                                    <option value="1/1.28">1/1.28-inch</option>
+                                    <option value="1/1.3">1/1.3-inch</option>
+                                    <option value="1/1.31">1/1.31-inch</option>
+                                    <option value="1/1.35">1/1.35-inch</option>
+                                    <option value="1/1.4">1/1.4-inch</option>
+                                    <option value="1/1.49">1/1.49-inch</option>
+                                    <option value="1/1.5">1/1.5-inch</option>
+                                    <option value="1/1.56">1/1.56-inch</option>
+                                    <option value="1/1.57">1/1.57-inch</option>
+                                    <option value="1/1.6">1/1.6-inch</option>
+                                    <option value="1/1.7">1/1.7-inch</option>
+                                    <option value="1/1.74">1/1.74-inch</option>
+                                    <option value="1/1.78">1/1.78-inch</option>
+                                    <option value="1/1.95">1/1.95-inch</option>
+                                    <option value="1/2">1/2-inch</option>
+                                    <option value="1/2.3">1/2.3-inch</option>
+                                    <option value="1/2.55">1/2.55-inch</option>
+                                    <option value="1/2.76">1/2.76-inch</option>
+                                    <option value="1/3">1/3-inch</option>
+                                    <option value="1/3.06">1/3.06-inch</option>
+                                    <option value="1/3.2">1/3.2-inch</option>
+                                    <option value="1/3.4">1/3.4-inch</option>
+                                    <option value="1/3.6">1/3.6-inch</option>
+                                    <option value="1/4">1/4-inch</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="focal-length-inputs">
+                            <div class="form-group">
+                                <label for="originalFocal">Original Focal Length (mm)</label>
+                                <input type="number" id="originalFocal" class="form-control" step="1" min="1" value="23">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newFocal">New Focal Length (mm)</label>
+                                <input type="number" id="newFocal" class="form-control" step="1" min="1" value="35">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="focalAperture">Aperture (f-stop)</label>
+                            <div class="input-prefix">
+                                <span class="prefix">f/</span>
+                                <input type="number" id="focalAperture" class="form-control" step="0.1" min="0.95" value="1.8">
+                            </div>
+                        </div>
+
+                        <button id="calculateFocal" class="btn-calculate">Calculate</button>
+
+                        <div id="focalResult" class="result-container hidden">
+                            <h3>🔍 Focal Length Equivalent Result</h3>
+                            
+                            <div class="result-section">
+                                <h4>Sensor Equivalence</h4>
+                                <div class="result-grid">
+                                    <div class="result-item">
+                                        <span class="result-label">Original Sensor:</span>
+                                        <span id="result-original-sensor" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Original Crop Factor:</span>
+                                        <span id="result-original-crop" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item highlight">
+                                        <span class="result-label">Equivalent Sensor:</span>
+                                        <span id="result-equivalent-sensor" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item highlight">
+                                        <span class="result-label">New Crop Factor:</span>
+                                        <span id="result-new-crop" class="result-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-section">
+                                <h4>Lens Performance</h4>
+                                <div class="result-grid">
+                                    <div class="result-item">
+                                        <span class="result-label">Original Focal Length:</span>
+                                        <span id="result-original-focal" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">New Focal Length:</span>
+                                        <span id="result-new-focal" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Aperture:</span>
+                                        <span id="result-focal-aperture" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item highlight">
+                                        <span class="result-label">Equivalent Aperture:</span>
+                                        <span id="result-focal-equivalent-aperture" class="result-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="result-section">
+                                <h4>Additional Information</h4>
+                                <div class="result-grid">
+                                    <div class="result-item">
+                                        <span class="result-label">Original Equiv. Focal Length:</span>
+                                        <span id="result-original-equiv-focal" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">New Equiv. Focal Length:</span>
+                                        <span id="result-new-equiv-focal" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Angle of View Change:</span>
+                                        <span id="result-angle-change" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Relative Sensor Area:</span>
+                                        <span id="result-relative-area" class="result-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="explanation">
+                                This calculation shows how changing focal length affects the sensor size equivalence.
+                                It helps understand which sensor your lens effectively behaves like when changing focal length,
+                                useful for evaluating lens performance across different focal ranges.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Lensify - California Sunshine Edition | Powered by Cloudflare</p>
+            <p class="motto">Capturing light from Malibu to Yosemite</p>
+        </footer>
+    </div>
+
+    <script src="sanfrancisco.js"></script>
+</body>
+</html>
