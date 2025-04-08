@@ -5,38 +5,38 @@
  */
 
 :root {
-  /* 主色调 - 加州阳光风格 */
-  --ocean-blue: #003153;       /* 深海蓝 - 主色调 */
-  --wine-red: #85120F;         /* 红酒色 - 按钮色 */
-  --sand-beige: #E3C79F;       /* 沙滩米色 - 上传框背景 */
-  --sky-light: #D4F1F9;        /* 浅蓝天空 - 背景渐变起始 */
-  --sand-light: #FDF6EC;       /* 浅沙色 - 背景渐变结束 */
-  --sand-dark: #D5BFA3;        /* 深沙色 - 边框和分隔线 */
+  /* Main colors - California sunshine style */
+  --ocean-blue: #003153;       /* Deep ocean blue - primary color */
+  --wine-red: #85120F;         /* Wine red - button color */
+  --sand-beige: #E3C79F;       /* Sand beige - input background */
+  --sky-light: #D4F1F9;        /* Light sky blue - gradient start */
+  --sand-light: #FDF6EC;       /* Light sand - gradient end */
+  --sand-dark: #D5BFA3;        /* Dark sand - borders and dividers */
   
-  /* 文字颜色 */
-  --text-dark: #222B45;        /* 深色文字 */
-  --text-light: #8F9BB3;       /* 浅色文字 */
-  --text-white: #FFFFFF;       /* 白色文字 */
+  /* Text colors */
+  --text-dark: #222B45;        /* Dark text */
+  --text-light: #8F9BB3;       /* Light text */
+  --text-white: #FFFFFF;       /* White text */
   
-  /* 功能色 */
-  --success: #00866E;          /* 成功色 - 加州松绿 */
-  --warning: #F9A826;          /* 警告色 - 加州橙 */
-  --error: #C53030;            /* 错误色 - 加州红 */
-  --coral: #FF7043;            /* 珊瑚色 - 辅助色 */
+  /* Functional colors */
+  --success: #00866E;          /* Success color - California pine green */
+  --warning: #F9A826;          /* Warning color - California orange */
+  --error: #C53030;            /* Error color - California red */
+  --coral: #FF7043;            /* Coral - accent color */
   
-  /* 间距变量 */
+  /* Spacing variables */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   
-  /* 边框半径 */
+  /* Border radius */
   --border-radius-sm: 0.25rem;
   --border-radius-md: 0.5rem;
   --border-radius-lg: 0.75rem;
   
-  /* 阴影 */
+  /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);

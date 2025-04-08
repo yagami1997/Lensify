@@ -9,13 +9,13 @@
 const API_URL = "https://lensify.encveil.dev";
 const FALLBACK_URL = "https://lensify-calculator.workers.dev";
 
-// 自定义路由URL示例（根据您的实际配置选择一种并取消注释）
-// const API_URL = "https://api.example.com";                   // 如果使用 api.example.com/calculate*
-// const API_URL = "https://example.com/api";                // 如果使用 example.com/api/calculate*
-// const API_URL = "https://calculator.example.com";         // 如果使用 calculator.example.com/*
-// const API_URL = "https://example.com/tools/lensify";      // 如果使用 example.com/tools/lensify/*
+// Custom route URL examples (choose one based on your actual configuration and uncomment)
+// const API_URL = "https://api.example.com";                   // If using api.example.com/calculate*
+// const API_URL = "https://example.com/api";                // If using example.com/api/calculate*
+// const API_URL = "https://calculator.example.com";         // If using calculator.example.com/*
+// const API_URL = "https://example.com/tools/lensify";      // If using example.com/tools/lensify/*
 
-// DOM元素 - 光圈计算器
+// DOM elements - Aperture calculator
 const sensorSelect = document.getElementById("sensorSize");
 const apertureInput = document.getElementById("aperture");
 const calculateButton = document.getElementById("calculate");
@@ -26,7 +26,7 @@ const resultInputAperture = document.getElementById("result-input-aperture");
 const resultEquivalentAperture = document.getElementById("result-equivalent-aperture");
 const connectionStatus = document.getElementById("connection-status");
 
-// DOM元素 - 焦距等效计算器
+// DOM elements - Focal length calculator
 const originalSensorSelect = document.getElementById("originalSensor");
 const originalFocalInput = document.getElementById("originalFocal");
 const newFocalInput = document.getElementById("newFocal");
@@ -34,7 +34,7 @@ const focalApertureInput = document.getElementById("focalAperture");
 const calculateFocalButton = document.getElementById("calculateFocal");
 const focalResultContainer = document.getElementById("focalResult");
 
-// DOM元素 - 标签页
+// DOM elements - Tabs
 const tabButtonAperture = document.getElementById("tab-button-aperture");
 const tabButtonFocal = document.getElementById("tab-button-focal");
 const tabAperture = document.getElementById("tab-aperture");
@@ -173,6 +173,54 @@ function validateFocalLengthInput(event) {
 }
 
 /**
+ * Format response data to ensure consistent decimal places
+ * @param {Object} data - Response data from API
+ * @returns {Object} - Formatted data
+ */
+function formatResponseData(data) {
+  // Create a copy to avoid modifying the original
+  const formatted = {...data};
+  
+  // Format aperture values to 1 decimal place
+  if (formatted.inputAperture !== undefined) {
+    formatted.inputAperture = parseFloat(parseFloat(formatted.inputAperture).toFixed(1));
+  }
+  
+  if (formatted.equivalentAperture !== undefined) {
+    formatted.equivalentAperture = parseFloat(parseFloat(formatted.equivalentAperture).toFixed(1));
+  }
+  
+  // Format crop factors to 2 decimal places
+  if (formatted.cropFactor !== undefined) {
+    formatted.cropFactor = parseFloat(parseFloat(formatted.cropFactor).toFixed(2));
+  }
+  
+  if (formatted.exactCropFactor !== undefined) {
+    formatted.exactCropFactor = parseFloat(parseFloat(formatted.exactCropFactor).toFixed(2));
+  }
+  
+  // Format area values
+  if (formatted.areaRatio !== undefined) {
+    formatted.areaRatio = parseFloat(parseFloat(formatted.areaRatio).toFixed(2));
+  }
+  
+  if (formatted.relativeSensorArea !== undefined) {
+    formatted.relativeSensorArea = parseFloat(parseFloat(formatted.relativeSensorArea).toFixed(2));
+  }
+  
+  // Format focal lengths to 1 decimal place
+  if (formatted.originalEquivalentFocalLength !== undefined) {
+    formatted.originalEquivalentFocalLength = parseFloat(parseFloat(formatted.originalEquivalentFocalLength).toFixed(1));
+  }
+  
+  if (formatted.newEquivalentFocalLength !== undefined) {
+    formatted.newEquivalentFocalLength = parseFloat(parseFloat(formatted.newEquivalentFocalLength).toFixed(1));
+  }
+  
+  return formatted;
+}
+
+/**
  * Call Worker API to calculate equivalent aperture
  */
 async function calculateEquivalentAperture() {
@@ -181,7 +229,7 @@ async function calculateEquivalentAperture() {
     return;
   }
   
-  // Get user input
+  // Get user input and ensure proper formatting
   const sensorSize = sensorSelect.value;
   const aperture = parseFloat(apertureInput.value);
   
@@ -229,33 +277,36 @@ async function calculateEquivalentAperture() {
     // Parse response data
     const data = await response.json();
     
+    // Format response data consistently
+    const formattedData = formatResponseData(data);
+    
     // If health check response, use mock data
-    if (data.status === "ok" && data.version) {
+    if (formattedData.status === "ok" && formattedData.version) {
       console.log("Received health check response, using mock data");
       const mockData = {
         sensorSize: SENSORS[sensorSize]?.name || "Unknown",
         cropFactor: SENSORS[sensorSize]?.cropFactor || 1.0,
-        inputAperture: aperture,
-        equivalentAperture: aperture * (SENSORS[sensorSize]?.cropFactor || 1.0)
+        inputAperture: parseFloat(aperture.toFixed(1)),
+        equivalentAperture: parseFloat((aperture * (SENSORS[sensorSize]?.cropFactor || 1.0)).toFixed(1))
       };
       updateResultUI(mockData);
       return;
     }
     
-    // Update result UI
-    updateResultUI(data);
+    // Update result UI with formatted data
+    updateResultUI(formattedData);
   } catch (error) {
     // Show error message
     showError(`Request failed: ${error.message || 'Unknown error'}`);
     
-    // If API request fails, use local calculation
+    // If API request fails, use local calculation with proper formatting
     console.log("API request failed, using local calculation");
     const fallbackCropFactor = SENSORS[sensorSize]?.cropFactor || 1.0;
     const fallbackData = {
       sensorSize: SENSORS[sensorSize]?.name || "Unknown",
       cropFactor: fallbackCropFactor,
-      inputAperture: aperture,
-      equivalentAperture: parseFloat((aperture * fallbackCropFactor).toFixed(2))
+      inputAperture: parseFloat(aperture.toFixed(1)),
+      equivalentAperture: parseFloat((aperture * fallbackCropFactor).toFixed(1))
     };
     updateResultUI(fallbackData);
   } finally {
@@ -333,11 +384,14 @@ async function calculateFocalEquivalent() {
     // Parse response data
     const data = await response.json();
     
-    // Add original aperture value for UI display
-    data.aperture = aperture;
+    // Format response data consistently
+    const formattedData = formatResponseData(data);
     
-    // Update result UI
-    updateFocalResultUI(data);
+    // Add original aperture value for UI display (formatted)
+    formattedData.aperture = parseFloat(aperture.toFixed(1));
+    
+    // Update result UI with formatted data
+    updateFocalResultUI(formattedData);
   } catch (error) {
     // Show error message
     showError(`Request failed: ${error.message || 'Unknown error'}`);
@@ -356,13 +410,18 @@ async function calculateFocalEquivalent() {
  * Local calculation of focal length equivalent
  */
 function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, newFocalLength, aperture) {
+  // Format all input values
+  aperture = parseFloat(aperture);
+  originalFocalLength = parseInt(originalFocalLength);
+  newFocalLength = parseInt(newFocalLength);
+  
   // Get original sensor crop factor
   const originalCropFactor = SENSORS[originalSensorId]?.cropFactor || 1.0;
   
   // Calculate actual sensor area ratio in digital zoom
   const areaRatio = (newFocalLength / originalFocalLength) ** 2;
   
-  // Calculate new equivalent crop factor
+  // Calculate new equivalent crop factor - Format to 2 decimal places
   const newCropFactor = parseFloat((originalCropFactor * (newFocalLength / originalFocalLength)).toFixed(2));
   
   // Find closest sensor
@@ -393,16 +452,16 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
     effectiveSensorSize = closestSensor.name;
   }
   
-  // Calculate equivalent aperture
+  // Calculate equivalent aperture - Format to exactly 1 decimal place
   const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(1));
   
-  // Calculate angle of view change
+  // Calculate angle of view change - Format to 1 decimal place
   const angleOfViewChange = parseFloat((1 - (newFocalLength / originalFocalLength)) * 100).toFixed(1);
   
-  // Calculate relative sensor area change
+  // Calculate relative sensor area change - Format to 2 decimal places
   const relativeSensorArea = parseFloat((1 / areaRatio).toFixed(2));
   
-  // Calculate equivalent focal length (relative to full frame)
+  // Calculate equivalent focal length (relative to full frame) - Format to 1 decimal place
   const originalEquivalentFocalLength = parseFloat((originalFocalLength * originalCropFactor).toFixed(1));
   const newEquivalentFocalLength = parseFloat((newFocalLength * newCropFactor).toFixed(1));
   
@@ -435,8 +494,13 @@ function updateResultUI(data) {
   // Set result value
   resultSensor.textContent = data.sensorSize;
   resultCropFactor.textContent = data.cropFactor.toFixed(2);
-  resultInputAperture.textContent = `f/${data.inputAperture.toFixed(1)}`;
-  resultEquivalentAperture.textContent = `f/${data.equivalentAperture.toFixed(1)}`;
+  
+  // Format aperture values to exactly one decimal place
+  const inputAperture = typeof data.inputAperture === 'number' ? data.inputAperture.toFixed(1) : parseFloat(data.inputAperture).toFixed(1);
+  const equivAperture = typeof data.equivalentAperture === 'number' ? data.equivalentAperture.toFixed(1) : parseFloat(data.equivalentAperture).toFixed(1);
+  
+  resultInputAperture.textContent = `f/${inputAperture}`;
+  resultEquivalentAperture.textContent = `f/${equivAperture}`;
   
   // Show result container
   resultContainer.classList.remove("hidden");
@@ -462,8 +526,11 @@ function updateFocalResultUI(data) {
   document.getElementById("result-new-focal").textContent = `${data.newFocalLength}mm`;
   
   // Fix aperture display, keep one decimal place
-  document.getElementById("result-focal-aperture").textContent = `f/${data.aperture ? data.aperture.toFixed(1) : focalApertureInput.value}`;
-  document.getElementById("result-focal-equivalent-aperture").textContent = `f/${data.equivalentAperture.toFixed(1)}`;
+  const aperture = data.aperture ? parseFloat(data.aperture).toFixed(1) : parseFloat(focalApertureInput.value).toFixed(1);
+  const equivAperture = parseFloat(data.equivalentAperture).toFixed(1);
+  
+  document.getElementById("result-focal-aperture").textContent = `f/${aperture}`;
+  document.getElementById("result-focal-equivalent-aperture").textContent = `f/${equivAperture}`;
   
   // Additional information - Use more intuitive designer-friendly labels
   document.getElementById("result-original-equiv-focal").textContent = `${data.originalEquivalentFocalLength}mm`;
