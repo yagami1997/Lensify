@@ -8,8 +8,8 @@ compatibility_date = "2023-05-18"
 # Routes Configuration
 [triggers]
 routes = [
-  { pattern = "lensify.pages.dev/api/*", zone_name = "pages.dev" },
-  { pattern = "lensify.encveil.dev/api/*", zone_name = "encveil.dev" }
+  { pattern = "lensify.pages.dev/*", zone_name = "pages.dev" },
+  { pattern = "lensify.encveil.dev/*", zone_name = "encveil.dev" }
 ]
 
 # SSL Configuration
