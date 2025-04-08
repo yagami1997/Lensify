@@ -54,4 +54,4 @@ $RECYCLE.BIN/
 *.sublime-project
 *.sublime-workspace
 *.komodoproject
-.komodotools/ 
+.komodotools/ wrangler.toml
