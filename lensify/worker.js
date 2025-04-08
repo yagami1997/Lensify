@@ -54,20 +54,35 @@ const corsHeaders = {
  * 处理API请求的主函数
  */
 async function handleRequest(request) {
+  // 添加健康检查端点
+  const url = new URL(request.url);
+  const path = url.pathname;
+  
+  // 处理健康检查
+  if (path === "/health" || path === "/") {
+    return new Response(JSON.stringify({ status: "ok", version: "1.0.0" }), {
+      headers: {
+        ...corsHeaders,
+        "Cache-Control": "no-cache"
+      }
+    });
+  }
+  
   // 处理OPTIONS预检请求
   if (request.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // 获取URL和查询参数
-  const url = new URL(request.url);
+  // 调试信息：记录请求详情
+  console.log("Request URL:", request.url);
+  console.log("Request method:", request.method);
+  console.log("Request path:", path);
   
-  // 直接处理任何路径的请求，因为我们使用了自定义域名 lensify.encveil.dev/*
-  // 不需要检查路径，直接获取查询参数并处理
-
   // 获取传感器类型和光圈值参数
   const sensorSize = url.searchParams.get("sensorSize");
   const aperture = parseFloat(url.searchParams.get("aperture"));
+  
+  console.log("Params:", { sensorSize, aperture });
 
   // 验证参数
   if (!sensorSize || !SENSORS[sensorSize]) {
