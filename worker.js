@@ -196,12 +196,44 @@ async function handleRequest(request) {
   
   // Handle static files for frontend
   if (path === "/" || !path.startsWith("/api")) {
-    // Serve index.html for root path
-    if (path === "/") {
-      return fetch("https://lensify-calculator.pages.dev/index.html");
+    try {
+      // Preserve all original headers and method for the fetch request
+      const pagesDomain = "lensify-calculator.pages.dev";
+      
+      // Create a new request with the appropriate URL
+      let pagesUrl = `https://${pagesDomain}${path}`;
+      if (path === "/") {
+        pagesUrl = `https://${pagesDomain}/index.html`;
+      }
+      
+      // Create a new request object with the same method and headers
+      const pageRequest = new Request(pagesUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        redirect: 'follow'
+      });
+      
+      // Fetch the content from Pages deployment
+      const response = await fetch(pageRequest);
+      
+      // Return the response with appropriate headers
+      const newResponse = new Response(response.body, response);
+      
+      // Make sure to add CORS headers if needed
+      newResponse.headers.set('Access-Control-Allow-Origin', '*');
+      
+      return newResponse;
+    } catch (error) {
+      console.error("Error fetching from Pages:", error);
+      return new Response(JSON.stringify({ 
+        error: "Failed to fetch static content", 
+        details: error.message 
+      }), { 
+        status: 500, 
+        headers: corsHeaders 
+      });
     }
-    // Serve other static files
-    return fetch(`https://lensify-calculator.pages.dev${path}`);
   }
   
   // Handle API health check
