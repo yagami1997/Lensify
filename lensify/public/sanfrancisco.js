@@ -1,21 +1,21 @@
 /**
- * San Francisco JS - Lensify前端交互脚本
+ * San Francisco JS - Lensify Frontend Interaction Script
  * 
- * 这个脚本负责处理用户输入和与Cloudflare Worker API的交互
- * 获取计算结果并更新界面
+ * This script handles user input and interaction with the Cloudflare Worker API
+ * Gets calculation results and updates the interface
  */
 
-// Worker API的URL配置 - 支持多种URL格式以增加兼容性
+// Worker API URL configuration - supports multiple URL formats for compatibility
 const API_URL = "https://lensify.encveil.dev";
 const FALLBACK_URL = "https://lensify-calculator.workers.dev";
 
-// 自定义路由URL示例（根据您的实际配置选择一种并取消注释）
-// const API_URL = "https://api.example.com";                   // 如果使用 api.example.com/calculate*
-// const API_URL = "https://example.com/api";                // 如果使用 example.com/api/calculate*
-// const API_URL = "https://calculator.example.com";         // 如果使用 calculator.example.com/*
-// const API_URL = "https://example.com/tools/lensify";      // 如果使用 example.com/tools/lensify/*
+// Custom route URL examples (choose one based on your actual configuration and uncomment)
+// const API_URL = "https://api.example.com";                   // If using api.example.com/calculate*
+// const API_URL = "https://example.com/api";                // If using example.com/api/calculate*
+// const API_URL = "https://calculator.example.com";         // If using calculator.example.com/*
+// const API_URL = "https://example.com/tools/lensify";      // If using example.com/tools/lensify/*
 
-// DOM元素 - 光圈计算器
+// DOM elements - Aperture calculator
 const sensorSelect = document.getElementById("sensorSize");
 const apertureInput = document.getElementById("aperture");
 const calculateButton = document.getElementById("calculate");
@@ -26,7 +26,7 @@ const resultInputAperture = document.getElementById("result-input-aperture");
 const resultEquivalentAperture = document.getElementById("result-equivalent-aperture");
 const connectionStatus = document.getElementById("connection-status");
 
-// DOM元素 - 焦距等效计算器
+// DOM elements - Focal length calculator
 const originalSensorSelect = document.getElementById("originalSensor");
 const originalFocalInput = document.getElementById("originalFocal");
 const newFocalInput = document.getElementById("newFocal");
@@ -34,28 +34,34 @@ const focalApertureInput = document.getElementById("focalAperture");
 const calculateFocalButton = document.getElementById("calculateFocal");
 const focalResultContainer = document.getElementById("focalResult");
 
-// DOM元素 - 标签页
+// DOM elements - Tabs
 const tabButtonAperture = document.getElementById("tab-button-aperture");
 const tabButtonFocal = document.getElementById("tab-button-focal");
 const tabAperture = document.getElementById("tab-aperture");
 const tabFocal = document.getElementById("tab-focal");
 
 /**
- * 初始化页面交互
+ * Initialize page interaction
  */
 function initializeApp() {
   console.log("Initializing app...");
   
-  // 首先检查DOM元素是否存在
+  // First check if DOM elements exist
   if (!sensorSelect || !apertureInput || !calculateButton) {
     console.error("Missing essential DOM elements for aperture calculator");
     return;
   }
   
-  // 添加计算按钮点击事件
+  // Set tab button texts to English
+  if (tabButtonAperture && tabButtonFocal) {
+    tabButtonAperture.textContent = "Aperture Calculator";
+    tabButtonFocal.textContent = "Focal Length Calculator";
+  }
+  
+  // Add calculate button click event
   calculateButton.addEventListener("click", calculateEquivalentAperture);
   
-  // 检查焦距计算器元素是否存在
+  // Check if focal length calculator elements exist
   const hasFocalTab = tabButtonFocal && tabButtonAperture && tabAperture && tabFocal && 
                       originalSensorSelect && originalFocalInput && newFocalInput && 
                       focalApertureInput && calculateFocalButton;
@@ -63,42 +69,42 @@ function initializeApp() {
   if (hasFocalTab) {
     console.log("Focal length tab elements found, initializing...");
     
-    // 添加焦距计算功能
+    // Add focal length calculation functionality
     calculateFocalButton.addEventListener("click", calculateFocalEquivalent);
     
-    // 添加标签页切换事件
+    // Add tab switch event
     tabButtonAperture.addEventListener("click", () => switchTab("aperture"));
     tabButtonFocal.addEventListener("click", () => switchTab("focal"));
     
-    // 添加键盘事件 - 焦距计算器
+    // Add keyboard event - focal length calculator
     focalApertureInput.addEventListener("keyup", function(event) {
       if (event.key === "Enter") {
         calculateFocalEquivalent();
       }
     });
     
-    // 添加输入验证 - 焦距计算器
+    // Add input validation - focal length calculator
     focalApertureInput.addEventListener("input", validateApertureInput);
     originalFocalInput.addEventListener("input", validateFocalLengthInput);
     newFocalInput.addEventListener("input", validateFocalLengthInput);
     
-    // 初始化时默认显示光圈计算器标签页
+    // Initialize with default aperture calculator tab
     switchTab("aperture");
   } else {
     console.warn("Focal length calculator elements not found, using aperture calculator only mode");
   }
   
-  // 添加键盘事件 - 光圈计算器
+  // Add keyboard event - aperture calculator
   apertureInput.addEventListener("keyup", function(event) {
     if (event.key === "Enter") {
       calculateEquivalentAperture();
     }
   });
   
-  // 添加输入验证 - 光圈计算器
+  // Add input validation - aperture calculator
   apertureInput.addEventListener("input", validateApertureInput);
   
-  // 检查API连接
+  // Check API connection
   checkApiConnection();
 }
 

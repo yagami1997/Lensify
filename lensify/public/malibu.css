@@ -1,8 +1,7 @@
-/* 
- * Malibu CSS - Lensify项目样式表
+/**
+ * Malibu CSS - Lensify Styles
  * 
- * 这个样式表定义了Lensify计算器的视觉外观
- * 采用加州阳光风格的设计
+ * This stylesheet defines the visual appearance of the Lensify calculator
  */
 
 :root {
@@ -310,7 +309,7 @@ input[type="number"] {
 .focal-length-inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: 1rem;
 }
 
 .result-section {
