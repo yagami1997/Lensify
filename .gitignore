@@ -55,3 +55,7 @@ $RECYCLE.BIN/
 *.sublime-workspace
 *.komodoproject
 .komodotools/ wrangler.toml
+
+# Configuration files with sensitive data
+wrangler.toml
+worker.js
