@@ -438,7 +438,7 @@ function updateFocalResultUI(data) {
   // 镜头性能
   document.getElementById("result-original-focal").textContent = `${data.originalFocalLength}mm`;
   document.getElementById("result-new-focal").textContent = `${data.newFocalLength}mm`;
-  document.getElementById("result-focal-aperture").textContent = `f/${data.equivalentAperture / data.exactCropFactor * data.closestSensor.cropFactor}`;
+  document.getElementById("result-focal-aperture").textContent = `f/${((data.equivalentAperture / data.exactCropFactor * data.closestSensor.cropFactor).toFixed(1))}`;
   document.getElementById("result-focal-equivalent-aperture").textContent = `f/${data.equivalentAperture.toFixed(1)}`;
   
   // 附加信息
