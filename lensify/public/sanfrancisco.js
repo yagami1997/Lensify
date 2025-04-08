@@ -469,13 +469,30 @@ function showError(message) {
  */
 async function checkApiConnection() {
   try {
-    const response = await fetch(`${API_URL}/health`);
-    if (response.ok) {
-      console.log("API connection established");
-      connectionStatus.classList.add("hidden");
-    } else {
-      throw new Error("API health check failed");
+    // 尝试几种不同的URL格式
+    const urlFormats = [
+      `${API_URL}/health`,
+      `${FALLBACK_URL}/health`
+    ];
+    
+    for (const url of urlFormats) {
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.status === "ok") {
+          console.log("API connection established:", url);
+          connectionStatus.classList.add("hidden");
+          return;
+        }
+      } catch (e) {
+        console.log("Failed with URL:", url, e.message);
+        continue;
+      }
     }
+    
+    // 如果所有URL都失败了，显示离线模式
+    throw new Error("All API endpoints failed");
   } catch (error) {
     console.warn("API connection failed:", error.message);
     connectionStatus.classList.remove("hidden");
