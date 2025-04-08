@@ -459,17 +459,15 @@ function updateFocalResultUI(data) {
   document.getElementById("result-focal-aperture").textContent = `f/${data.aperture ? data.aperture.toFixed(1) : focalApertureInput.value}`;
   document.getElementById("result-focal-equivalent-aperture").textContent = `f/${data.equivalentAperture.toFixed(1)}`;
   
-  // 附加信息
-  // 修改为更有意义的信息：使用面积比和数码变焦倍率
+  // 附加信息 - 使用更直观的设计师友好标签
   document.getElementById("result-original-equiv-focal").textContent = `${data.originalEquivalentFocalLength}mm`;
   document.getElementById("result-new-equiv-focal").textContent = `${data.newEquivalentFocalLength}mm`;
   
-  // 变焦倍率
-  const zoomRatio = (data.newFocalLength / data.originalFocalLength).toFixed(1);
-  document.getElementById("result-angle-change").textContent = `${zoomRatio}x`;
+  // 视角变化百分比 - 显示更直观的视角变化
+  document.getElementById("result-angle-change").textContent = data.angleOfViewChange;
   
   // 显示实际使用的传感器面积比例
-  document.getElementById("result-relative-area").textContent = `${((1 / data.areaRatio) * 100).toFixed(0)}%`;
+  document.getElementById("result-relative-area").textContent = `${data.relativeSensorArea}x`;
   
   // 显示结果容器
   focalResultContainer.classList.remove("hidden");

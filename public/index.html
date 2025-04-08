@@ -27,8 +27,8 @@
             <!-- 标签页导航 -->
             <div class="tab-container">
                 <div class="tab-buttons">
-                    <button id="tab-button-aperture" class="tab-button active">光圈计算器</button>
-                    <button id="tab-button-focal" class="tab-button">焦距等效计算器</button>
+                    <button id="tab-button-aperture" class="tab-button active">Aperture Calculator</button>
+                    <button id="tab-button-focal" class="tab-button">Focal Length Calculator</button>
                 </div>
             
                 <!-- 光圈计算器标签页 -->
@@ -238,28 +238,29 @@
                                 <h4>Additional Information</h4>
                                 <div class="result-grid">
                                     <div class="result-item">
-                                        <span class="result-label">Original Equiv. Focal Length:</span>
+                                        <span class="result-label">Full-frame Focal Length (Original):</span>
                                         <span id="result-original-equiv-focal" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">New Equiv. Focal Length:</span>
+                                        <span class="result-label">Full-frame Focal Length (New):</span>
                                         <span id="result-new-equiv-focal" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Digital Zoom Factor:</span>
+                                        <span class="result-label">Field of View Change:</span>
                                         <span id="result-angle-change" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Used Sensor Area:</span>
+                                        <span class="result-label">Active Sensor Area:</span>
                                         <span id="result-relative-area" class="result-value">-</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <p class="explanation">
-                                This calculation shows how digital zoom affects the effective sensor size.
-                                The "Equivalent Sensor" shows what smaller sensor size your current zoom level effectively uses,
-                                which helps evaluate image quality when using digital zoom.
+                                This calculation shows the real-world impact of changing your focal length. 
+                                The "Full-frame Focal Length" values show what these settings would look like on a full-frame camera.
+                                The "Field of View Change" shows how much your composition widens or narrows.
+                                The "Active Sensor Area" shows what portion of your sensor is actually being used.
                             </p>
                         </div>
                     </div>
