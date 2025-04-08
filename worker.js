@@ -51,6 +51,71 @@ const corsHeaders = {
 };
 
 /**
+ * 计算不同焦距下的等效传感器和等效光圈
+ * @param {string} originalSensorId - 原始传感器ID
+ * @param {number} originalFocalLength - 原始焦距(mm)
+ * @param {number} newFocalLength - 新焦距(mm)
+ * @param {number} aperture - 光圈值
+ * @returns {Object} - 计算结果
+ */
+function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFocalLength, aperture) {
+  // 获取原始传感器的裁切系数
+  const originalCropFactor = SENSORS[originalSensorId].cropFactor;
+  
+  // 计算新的等效裁切系数
+  const newCropFactor = parseFloat((originalCropFactor * (originalFocalLength / newFocalLength)).toFixed(2));
+  
+  // 找到最接近的传感器
+  let closestSensor = null;
+  let minDifference = Infinity;
+  
+  for (const [sensorId, sensorData] of Object.entries(SENSORS)) {
+    const difference = Math.abs(sensorData.cropFactor - newCropFactor);
+    if (difference < minDifference) {
+      minDifference = difference;
+      closestSensor = {
+        id: sensorId,
+        name: sensorData.name,
+        cropFactor: sensorData.cropFactor
+      };
+    }
+  }
+  
+  // 计算等效光圈
+  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(2));
+  
+  // 计算视角变化百分比
+  // 例如：从50mm到35mm，视角变化为 (1 - 35/50) * 100 = 30%，表示视角增加了30%
+  const angleOfViewChange = parseFloat((1 - (newFocalLength / originalFocalLength)) * 100).toFixed(1);
+  
+  // 计算感光面积相对变化
+  const relativeSensorArea = parseFloat(((originalCropFactor / newCropFactor) ** 2).toFixed(2));
+  
+  // 计算等效焦距（相对于全画幅）
+  const originalEquivalentFocalLength = parseFloat((originalFocalLength * originalCropFactor).toFixed(1));
+  const newEquivalentFocalLength = parseFloat((newFocalLength * newCropFactor).toFixed(1));
+  
+  // 返回结果
+  return {
+    exactCropFactor: newCropFactor,
+    closestSensor: closestSensor,
+    cropFactorDifference: parseFloat(minDifference.toFixed(3)),
+    equivalentAperture: equivalentAperture,
+    originalFocalLength: originalFocalLength,
+    newFocalLength: newFocalLength,
+    originalSensor: {
+      id: originalSensorId,
+      name: SENSORS[originalSensorId].name,
+      cropFactor: originalCropFactor
+    },
+    angleOfViewChange: `${angleOfViewChange}%`,
+    relativeSensorArea: relativeSensorArea,
+    originalEquivalentFocalLength: originalEquivalentFocalLength,
+    newEquivalentFocalLength: newEquivalentFocalLength
+  };
+}
+
+/**
  * 处理API请求的主函数
  */
 async function handleRequest(request) {
@@ -60,7 +125,7 @@ async function handleRequest(request) {
   
   // 处理健康检查
   if (path === "/health" || path === "/") {
-    return new Response(JSON.stringify({ status: "ok", version: "1.0.0" }), {
+    return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
       headers: {
         ...corsHeaders,
         "Cache-Control": "no-cache"
@@ -78,11 +143,66 @@ async function handleRequest(request) {
   console.log("Request method:", request.method);
   console.log("Request path:", path);
   
+  // 检查是否是等效传感器计算请求
+  if (path === "/focal-equiv" || path === "/focal-equivalent") {
+    const originalSensorId = url.searchParams.get("originalSensor");
+    const originalFocalLength = parseFloat(url.searchParams.get("originalFocal"));
+    const newFocalLength = parseFloat(url.searchParams.get("newFocal"));
+    const aperture = parseFloat(url.searchParams.get("aperture"));
+    
+    console.log("Focal Equiv Params:", { 
+      originalSensorId, 
+      originalFocalLength, 
+      newFocalLength, 
+      aperture 
+    });
+    
+    // 验证参数
+    if (!originalSensorId || !SENSORS[originalSensorId]) {
+      return new Response(
+        JSON.stringify({ error: "Invalid original sensor size" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+    
+    if (isNaN(originalFocalLength) || originalFocalLength <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid original focal length" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+    
+    if (isNaN(newFocalLength) || newFocalLength <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid new focal length" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+    
+    if (isNaN(aperture) || aperture <= 0) {
+      return new Response(
+        JSON.stringify({ error: "Invalid aperture value" }),
+        { status: 400, headers: corsHeaders }
+      );
+    }
+    
+    // 计算等效传感器和光圈
+    const result = calculateEquivalentSensor(
+      originalSensorId,
+      originalFocalLength,
+      newFocalLength,
+      aperture
+    );
+    
+    return new Response(JSON.stringify(result), { headers: corsHeaders });
+  }
+  
+  // 常规光圈等效计算
   // 获取传感器类型和光圈值参数
   const sensorSize = url.searchParams.get("sensorSize");
   const aperture = parseFloat(url.searchParams.get("aperture"));
   
-  console.log("Params:", { sensorSize, aperture });
+  console.log("Aperture Equiv Params:", { sensorSize, aperture });
 
   // 验证参数
   if (!sensorSize || !SENSORS[sensorSize]) {
