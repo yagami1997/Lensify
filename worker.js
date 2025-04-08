@@ -209,38 +209,41 @@ async function handleApiRequest(request) {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Handle regular aperture equivalent calculation
-  if (path === "/api" || path === "/api/calculate") {
-    const sensorSize = searchParams.get("sensorSize");
-    const aperture = parseFloat(searchParams.get("aperture"));
+  // Handle regular aperture equivalent calculation directly in the root path with query params
+  if (path === "/" || path === "/api" || path === "/api/calculate") {
+    // 检查是否存在查询参数
+    if (searchParams.has("sensorSize") && searchParams.has("aperture")) {
+      const sensorSize = searchParams.get("sensorSize");
+      const aperture = parseFloat(searchParams.get("aperture"));
 
-    if (!sensorSize || !SENSORS[sensorSize]) {
-      return new Response(
-        JSON.stringify({ error: "Invalid sensor size" }),
-        { status: 400, headers: corsHeaders }
-      );
+      if (!sensorSize || !SENSORS[sensorSize]) {
+        return new Response(
+          JSON.stringify({ error: "Invalid sensor size" }),
+          { status: 400, headers: corsHeaders }
+        );
+      }
+
+      if (!aperture || aperture <= 0) {
+        return new Response(
+          JSON.stringify({ error: "Invalid aperture value" }),
+          { status: 400, headers: corsHeaders }
+        );
+      }
+
+      const sensorData = SENSORS[sensorSize];
+      const cropFactor = safeNumber(sensorData.cropFactor, 1);
+      const equivalentAperture = safeFormattedNumber(aperture * cropFactor, 1);
+
+      const result = {
+        sensorSize: safeString(sensorData.name),
+        sensorId: sensorSize,
+        cropFactor: cropFactor,
+        inputAperture: safeFormattedNumber(aperture, 1),
+        equivalentAperture: equivalentAperture
+      };
+
+      return new Response(JSON.stringify(result), { headers: corsHeaders });
     }
-
-    if (!aperture || aperture <= 0) {
-      return new Response(
-        JSON.stringify({ error: "Invalid aperture value" }),
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    const sensorData = SENSORS[sensorSize];
-    const cropFactor = safeNumber(sensorData.cropFactor, 1);
-    const equivalentAperture = safeFormattedNumber(aperture * cropFactor, 1);
-
-    const result = {
-      sensorSize: safeString(sensorData.name),
-      sensorId: sensorSize,
-      cropFactor: cropFactor,
-      inputAperture: safeFormattedNumber(aperture, 1),
-      equivalentAperture: equivalentAperture
-    };
-
-    return new Response(JSON.stringify(result), { headers: corsHeaders });
   }
 
   // Handle focal length equivalent calculation
@@ -289,11 +292,7 @@ async function handleApiRequest(request) {
     return new Response(JSON.stringify(result), { headers: corsHeaders });
   }
   
-  // Handle 404 for unknown API endpoints
-  return new Response(
-    JSON.stringify({ error: "Not Found", path: path }),
-    { status: 404, headers: corsHeaders }
-  );
+  return null; // 返回null表示不是API请求
 }
 
 /**
@@ -302,12 +301,13 @@ async function handleApiRequest(request) {
 async function handleRequest(request) {
   const url = new URL(request.url);
   
-  // Handle API requests
-  if (url.pathname.startsWith('/api/')) {
-    return handleApiRequest(request);
+  // 首先尝试处理API请求
+  const apiResponse = await handleApiRequest(request);
+  if (apiResponse) {
+    return apiResponse;
   }
 
-  // For all other requests, proxy to Cloudflare Pages
+  // 对于所有其他请求，代理到Cloudflare Pages
   try {
     const pagesUrl = new URL(url.pathname, 'https://lensify.pages.dev');
     const pageRequest = new Request(pagesUrl, {
@@ -316,9 +316,22 @@ async function handleRequest(request) {
       body: request.body
     });
     
-    return fetch(pageRequest);
+    const response = await fetch(pageRequest);
+    
+    // 创建一个新的Response以确保CORS头正确
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: {
+        ...Object.fromEntries(response.headers.entries()),
+        ...corsHeaders
+      }
+    });
   } catch (error) {
-    return new Response('Error proxying to Pages: ' + error.message, { status: 500 });
+    return new Response(`Error proxying to Pages: ${error.message}`, { 
+      status: 500,
+      headers: corsHeaders
+    });
   }
 }
 
