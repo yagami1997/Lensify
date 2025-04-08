@@ -1,14 +1,24 @@
-# Lensify 📷 ✨
+# <div align="center">Lensify 📷 ✨</div>
 
-![GPL v3](https://img.shields.io/badge/License-GPL_v3-blue.svg)
-![Cloudflare Workers](https://img.shields.io/badge/platform-Cloudflare_Workers-orange)
-![ES6](https://img.shields.io/badge/JavaScript-ES6-yellow)
-![Custom](https://img.shields.io/badge/CSS-Custom-blueviolet)
-![active](https://img.shields.io/badge/status-active-success)
+<div align="center">
+  <img src="https://img.shields.io/badge/License-GPL_v3-blue.svg" alt="GPL v3">
+  <img src="https://img.shields.io/badge/platform-Cloudflare_Workers-orange" alt="Cloudflare Workers">
+  <img src="https://img.shields.io/badge/JavaScript-ES6-yellow" alt="ES6">
+  <img src="https://img.shields.io/badge/CSS-Custom-blueviolet" alt="Custom">
+  <img src="https://img.shields.io/badge/status-active-success" alt="active">
+</div>
 
-**Precision tools for photographers and filmmakers - anywhere, anytime**
+<div align="center">
+  <strong>Precision tools for photographers and filmmakers - anywhere, anytime</strong>
+</div>
 
-[Live Demo](https://lensify.pages.dev/) | [Documentation](#documentation) | [Installation](#installation) | [Features](#features) | [API](#api)
+<div align="center">
+  <a href="https://lensify.pages.dev/">Live Demo</a> |
+  <a href="#documentation">Documentation</a> |
+  <a href="#installation">Installation</a> |
+  <a href="#features">Features</a> |
+  <a href="#api">API</a>
+</div>
 
 ## 🌟 Overview
 
@@ -239,6 +249,8 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 
 ---
 
-© 2025 Lensify - Precision tools for photographers and filmmakers
-
-*Crafted with ♥ for the global creative community*
+<div align="center">
+  © 2025 Lensify - Precision tools for photographers and filmmakers
+  
+  <em>Crafted with ♥ for the global creative community</em>
+</div>
