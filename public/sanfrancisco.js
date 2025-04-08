@@ -109,24 +109,24 @@ function initializeApp() {
 }
 
 /**
- * Switch tabs
+ * 切换标签页
  */
 function switchTab(tabName) {
   console.log(`Switching to tab: ${tabName}`);
   
-  // Check if all tab elements exist
+  // 检查所有标签页元素是否存在
   if (!tabButtonAperture || !tabButtonFocal || !tabAperture || !tabFocal) {
     console.error("Tab elements missing, cannot switch tabs");
     return;
   }
   
-  // Remove active class from all tabs
+  // 移除所有标签页的active类
   tabButtonAperture.classList.remove("active");
   tabButtonFocal.classList.remove("active");
   tabAperture.classList.remove("active");
   tabFocal.classList.remove("active");
   
-  // Add active class to selected tab
+  // 添加active类到选中的标签页
   if (tabName === "aperture") {
     tabButtonAperture.classList.add("active");
     tabAperture.classList.add("active");
@@ -137,13 +137,13 @@ function switchTab(tabName) {
 }
 
 /**
- * Aperture input validation
+ * 光圈输入验证
  */
 function validateApertureInput(event) {
   const input = event?.target || this;
   const value = parseFloat(input.value);
   
-  // Ensure aperture value is positive
+  // 确保光圈值为正数
   if (isNaN(value) || value <= 0) {
     input.setCustomValidity("Please enter a positive number");
     input.reportValidity();
@@ -155,13 +155,13 @@ function validateApertureInput(event) {
 }
 
 /**
- * Focal length input validation
+ * 焦距输入验证
  */
 function validateFocalLengthInput(event) {
   const input = event?.target || this;
   const value = parseFloat(input.value);
   
-  // Ensure focal length is positive integer
+  // 确保焦距为正整数
   if (isNaN(value) || value <= 0 || !Number.isInteger(value)) {
     input.setCustomValidity("Please enter a positive integer");
     input.reportValidity();
@@ -173,76 +173,28 @@ function validateFocalLengthInput(event) {
 }
 
 /**
- * Format response data to ensure consistent decimal places
- * @param {Object} data - Response data from API
- * @returns {Object} - Formatted data
- */
-function formatResponseData(data) {
-  // Create a copy to avoid modifying the original
-  const formatted = {...data};
-  
-  // Format aperture values to 1 decimal place
-  if (formatted.inputAperture !== undefined) {
-    formatted.inputAperture = parseFloat(parseFloat(formatted.inputAperture).toFixed(1));
-  }
-  
-  if (formatted.equivalentAperture !== undefined) {
-    formatted.equivalentAperture = parseFloat(parseFloat(formatted.equivalentAperture).toFixed(1));
-  }
-  
-  // Format crop factors to 2 decimal places
-  if (formatted.cropFactor !== undefined) {
-    formatted.cropFactor = parseFloat(parseFloat(formatted.cropFactor).toFixed(2));
-  }
-  
-  if (formatted.exactCropFactor !== undefined) {
-    formatted.exactCropFactor = parseFloat(parseFloat(formatted.exactCropFactor).toFixed(2));
-  }
-  
-  // Format area values
-  if (formatted.areaRatio !== undefined) {
-    formatted.areaRatio = parseFloat(parseFloat(formatted.areaRatio).toFixed(2));
-  }
-  
-  if (formatted.relativeSensorArea !== undefined) {
-    formatted.relativeSensorArea = parseFloat(parseFloat(formatted.relativeSensorArea).toFixed(2));
-  }
-  
-  // Format focal lengths to 1 decimal place
-  if (formatted.originalEquivalentFocalLength !== undefined) {
-    formatted.originalEquivalentFocalLength = parseFloat(parseFloat(formatted.originalEquivalentFocalLength).toFixed(1));
-  }
-  
-  if (formatted.newEquivalentFocalLength !== undefined) {
-    formatted.newEquivalentFocalLength = parseFloat(parseFloat(formatted.newEquivalentFocalLength).toFixed(1));
-  }
-  
-  return formatted;
-}
-
-/**
- * Call Worker API to calculate equivalent aperture
+ * 调用Worker API计算等效光圈
  */
 async function calculateEquivalentAperture() {
-  // Validate input
+  // 验证输入
   if (!validateApertureInput({ target: apertureInput })) {
     return;
   }
   
-  // Get user input and ensure proper formatting
+  // 获取用户输入
   const sensorSize = sensorSelect.value;
   const aperture = parseFloat(apertureInput.value);
   
   try {
-    // Disable button, show loading state
+    // 禁用按钮，显示加载状态
     calculateButton.disabled = true;
     calculateButton.textContent = "Calculating...";
     
-    // Use multiple URL formats to increase success rate
+    // 使用多种URL格式尝试，增加成功率
     let response;
     let error;
     
-    // Try different URL formats
+    // 尝试几种不同的URL格式
     const urlFormats = [
       `${API_URL}?sensorSize=${encodeURIComponent(sensorSize)}&aperture=${encodeURIComponent(aperture)}`,
       `${API_URL}/calculate?sensorSize=${encodeURIComponent(sensorSize)}&aperture=${encodeURIComponent(aperture)}`,
@@ -251,7 +203,7 @@ async function calculateEquivalentAperture() {
       `${FALLBACK_URL}/calculate?sensorSize=${encodeURIComponent(sensorSize)}&aperture=${encodeURIComponent(aperture)}`
     ];
     
-    // Try different URLs
+    // 依次尝试不同的URL
     for (const url of urlFormats) {
       try {
         console.log("Trying URL:", url);
@@ -259,68 +211,65 @@ async function calculateEquivalentAperture() {
         
         if (response.ok) {
           console.log("Success with URL:", url);
-          // Found working URL, exit loop
+          // 找到可工作的URL，退出循环
           break;
         }
       } catch (e) {
         console.log("Failed with URL:", url, e.message);
         error = e;
-        // Continue to next URL
+        // 继续尝试下一个URL
       }
     }
     
-    // If no working URL, throw last error
+    // 如果没有可工作的URL，抛出最后的错误
     if (!response || !response.ok) {
       throw error || new Error("All API endpoints failed");
     }
     
-    // Parse response data
+    // 解析响应数据
     const data = await response.json();
     
-    // Format response data consistently
-    const formattedData = formatResponseData(data);
-    
-    // If health check response, use mock data
-    if (formattedData.status === "ok" && formattedData.version) {
+    // 如果是健康检查响应，使用模拟数据
+    if (data.status === "ok" && data.version) {
       console.log("Received health check response, using mock data");
       const mockData = {
         sensorSize: SENSORS[sensorSize]?.name || "Unknown",
         cropFactor: SENSORS[sensorSize]?.cropFactor || 1.0,
-        inputAperture: parseFloat(aperture.toFixed(1)),
-        equivalentAperture: parseFloat((aperture * (SENSORS[sensorSize]?.cropFactor || 1.0)).toFixed(1))
+        inputAperture: aperture,
+        equivalentAperture: aperture * (SENSORS[sensorSize]?.cropFactor || 1.0)
       };
       updateResultUI(mockData);
       return;
     }
     
-    // Update result UI with formatted data
-    updateResultUI(formattedData);
+    // 更新结果UI
+    updateResultUI(data);
   } catch (error) {
-    // Show error message
-    showError(`Request failed: ${error.message || 'Unknown error'}`);
+    // 显示错误信息
+    showError(`请求失败: ${error.message || '未知错误'}`);
     
-    // If API request fails, use local calculation with proper formatting
+    // 如果API请求失败，使用本地计算
     console.log("API request failed, using local calculation");
     const fallbackCropFactor = SENSORS[sensorSize]?.cropFactor || 1.0;
     const fallbackData = {
       sensorSize: SENSORS[sensorSize]?.name || "Unknown",
       cropFactor: fallbackCropFactor,
-      inputAperture: parseFloat(aperture.toFixed(1)),
-      equivalentAperture: parseFloat((aperture * fallbackCropFactor).toFixed(1))
+      inputAperture: aperture,
+      equivalentAperture: parseFloat((aperture * fallbackCropFactor).toFixed(2))
     };
     updateResultUI(fallbackData);
   } finally {
-    // Restore button state
+    // 恢复按钮状态
     calculateButton.disabled = false;
     calculateButton.textContent = "Calculate";
   }
 }
 
 /**
- * Calculate focal length equivalent
+ * 计算焦距等效
  */
 async function calculateFocalEquivalent() {
-  // Validate input
+  // 验证输入
   if (!validateApertureInput({ target: focalApertureInput })) {
     return;
   }
@@ -333,18 +282,18 @@ async function calculateFocalEquivalent() {
     return;
   }
   
-  // Get user input
+  // 获取用户输入
   const originalSensor = originalSensorSelect.value;
   const originalFocal = parseInt(originalFocalInput.value);
   const newFocal = parseInt(newFocalInput.value);
   const aperture = parseFloat(focalApertureInput.value);
   
   try {
-    // Disable button, show loading state
+    // 禁用按钮，显示加载状态
     calculateFocalButton.disabled = true;
     calculateFocalButton.textContent = "Calculating...";
     
-    // Try different URL formats
+    // 尝试几种不同的URL格式
     const urlFormats = [
       `${API_URL}/focal-equiv?originalSensor=${encodeURIComponent(originalSensor)}&originalFocal=${encodeURIComponent(originalFocal)}&newFocal=${encodeURIComponent(newFocal)}&aperture=${encodeURIComponent(aperture)}`,
       `${API_URL}/focal-equivalent?originalSensor=${encodeURIComponent(originalSensor)}&originalFocal=${encodeURIComponent(originalFocal)}&newFocal=${encodeURIComponent(newFocal)}&aperture=${encodeURIComponent(aperture)}`,
@@ -355,7 +304,7 @@ async function calculateFocalEquivalent() {
     let response;
     let error;
     
-    // Try different URLs
+    // 依次尝试不同的URL
     for (const url of urlFormats) {
       try {
         console.log("Trying URL:", url);
@@ -363,68 +312,54 @@ async function calculateFocalEquivalent() {
         
         if (response.ok) {
           console.log("Success with URL:", url);
-          // Found working URL, exit loop
+          // 找到可工作的URL，退出循环
           break;
         }
       } catch (e) {
         console.log("Failed with URL:", url, e.message);
         error = e;
-        // Continue to next URL
+        // 继续尝试下一个URL
       }
     }
     
-    // If no working URL, use local calculation
+    // 如果没有可工作的URL，使用本地计算
     if (!response || !response.ok) {
       console.log("All API endpoints failed, using local calculation");
       const result = calculateLocalFocalEquivalent(originalSensor, originalFocal, newFocal, aperture);
-      updateFocalResultUI({...result, aperture});
+      updateFocalResultUI(result);
       return;
     }
     
-    // Parse response data
+    // 解析响应数据
     const data = await response.json();
     
-    // Format response data consistently
-    const formattedData = formatResponseData(data);
-    
-    // Add original aperture value for UI display (formatted)
-    formattedData.aperture = parseFloat(aperture.toFixed(1));
-    
-    // Update result UI with formatted data
-    updateFocalResultUI(formattedData);
+    // 更新结果UI
+    updateFocalResultUI(data);
   } catch (error) {
-    // Show error message
-    showError(`Request failed: ${error.message || 'Unknown error'}`);
+    // 显示错误信息
+    showError(`请求失败: ${error.message || '未知错误'}`);
     
-    // Use local calculation
+    // 使用本地计算
     const result = calculateLocalFocalEquivalent(originalSensor, originalFocal, newFocal, aperture);
-    updateFocalResultUI({...result, aperture});
+    updateFocalResultUI(result);
   } finally {
-    // Restore button state
+    // 恢复按钮状态
     calculateFocalButton.disabled = false;
     calculateFocalButton.textContent = "Calculate";
   }
 }
 
 /**
- * Local calculation of focal length equivalent
+ * 本地计算焦距等效
  */
 function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, newFocalLength, aperture) {
-  // Format all input values
-  aperture = parseFloat(aperture);
-  originalFocalLength = parseInt(originalFocalLength);
-  newFocalLength = parseInt(newFocalLength);
-  
-  // Get original sensor crop factor
+  // 获取原始传感器的裁切系数
   const originalCropFactor = SENSORS[originalSensorId]?.cropFactor || 1.0;
   
-  // Calculate actual sensor area ratio in digital zoom
-  const areaRatio = (newFocalLength / originalFocalLength) ** 2;
+  // 计算新的等效裁切系数
+  const newCropFactor = parseFloat((originalCropFactor * (originalFocalLength / newFocalLength)).toFixed(2));
   
-  // Calculate new equivalent crop factor - Format to 2 decimal places
-  const newCropFactor = parseFloat((originalCropFactor * (newFocalLength / originalFocalLength)).toFixed(2));
-  
-  // Find closest sensor
+  // 找到最接近的传感器
   let closestSensor = null;
   let minDifference = Infinity;
   
@@ -440,36 +375,23 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
     }
   }
   
-  // Calculate current actual equivalent sensor size
-  let effectiveSensorSize;
-  if (originalSensorId.startsWith("1/")) {
-    // If original sensor is 1/x format
-    const originalDenominator = parseFloat(originalSensorId.substring(2));
-    const newDenominator = originalDenominator * Math.sqrt(areaRatio);
-    effectiveSensorSize = `1/${newDenominator.toFixed(2)}`;
-  } else {
-    // If other format sensor size, directly use closestSensor
-    effectiveSensorSize = closestSensor.name;
-  }
+  // 计算等效光圈
+  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(2));
   
-  // Calculate equivalent aperture - Format to exactly 1 decimal place
-  const equivalentAperture = parseFloat((aperture * newCropFactor).toFixed(1));
-  
-  // Calculate angle of view change - Format to 1 decimal place
+  // 计算视角变化
   const angleOfViewChange = parseFloat((1 - (newFocalLength / originalFocalLength)) * 100).toFixed(1);
   
-  // Calculate relative sensor area change - Format to 2 decimal places
-  const relativeSensorArea = parseFloat((1 / areaRatio).toFixed(2));
+  // 计算感光面积相对变化
+  const relativeSensorArea = parseFloat(((originalCropFactor / newCropFactor) ** 2).toFixed(2));
   
-  // Calculate equivalent focal length (relative to full frame) - Format to 1 decimal place
+  // 计算等效焦距（相对于全画幅）
   const originalEquivalentFocalLength = parseFloat((originalFocalLength * originalCropFactor).toFixed(1));
   const newEquivalentFocalLength = parseFloat((newFocalLength * newCropFactor).toFixed(1));
   
-  // Return result
+  // 返回结果
   return {
     exactCropFactor: newCropFactor,
     closestSensor: closestSensor,
-    effectiveSensorSize: effectiveSensorSize,
     cropFactorDifference: parseFloat(minDifference.toFixed(3)),
     equivalentAperture: equivalentAperture,
     originalFocalLength: originalFocalLength,
@@ -481,86 +403,69 @@ function calculateLocalFocalEquivalent(originalSensorId, originalFocalLength, ne
     },
     angleOfViewChange: `${angleOfViewChange}%`,
     relativeSensorArea: relativeSensorArea,
-    areaRatio: parseFloat(areaRatio.toFixed(2)),
     originalEquivalentFocalLength: originalEquivalentFocalLength,
     newEquivalentFocalLength: newEquivalentFocalLength
   };
 }
 
 /**
- * Update aperture calculation result UI
+ * 更新光圈计算结果UI
  */
 function updateResultUI(data) {
-  // Set result value
+  // 设置结果值
   resultSensor.textContent = data.sensorSize;
   resultCropFactor.textContent = data.cropFactor.toFixed(2);
+  resultInputAperture.textContent = `f/${data.inputAperture.toFixed(1)}`;
+  resultEquivalentAperture.textContent = `f/${data.equivalentAperture.toFixed(1)}`;
   
-  // Format aperture values to exactly one decimal place
-  const inputAperture = typeof data.inputAperture === 'number' ? data.inputAperture.toFixed(1) : parseFloat(data.inputAperture).toFixed(1);
-  const equivAperture = typeof data.equivalentAperture === 'number' ? data.equivalentAperture.toFixed(1) : parseFloat(data.equivalentAperture).toFixed(1);
-  
-  resultInputAperture.textContent = `f/${inputAperture}`;
-  resultEquivalentAperture.textContent = `f/${equivAperture}`;
-  
-  // Show result container
+  // 显示结果容器
   resultContainer.classList.remove("hidden");
   
-  // Scroll to result area
+  // 滚动到结果区域
   resultContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 /**
- * Update focal length equivalent calculation result UI
+ * 更新焦距等效计算结果UI
  */
 function updateFocalResultUI(data) {
-  // Sensor information
+  // 传感器信息
   document.getElementById("result-original-sensor").textContent = data.originalSensor.name;
   document.getElementById("result-original-crop").textContent = data.originalSensor.cropFactor.toFixed(2);
-  
-  // Update equivalent sensor information (focus on actual used sensor area)
-  document.getElementById("result-equivalent-sensor").textContent = data.effectiveSensorSize || data.closestSensor.name;
+  document.getElementById("result-equivalent-sensor").textContent = data.closestSensor.name;
   document.getElementById("result-new-crop").textContent = data.exactCropFactor.toFixed(2);
   
-  // Lens performance
+  // 镜头性能
   document.getElementById("result-original-focal").textContent = `${data.originalFocalLength}mm`;
   document.getElementById("result-new-focal").textContent = `${data.newFocalLength}mm`;
+  document.getElementById("result-focal-aperture").textContent = `f/${data.equivalentAperture / data.exactCropFactor * data.closestSensor.cropFactor}`;
+  document.getElementById("result-focal-equivalent-aperture").textContent = `f/${data.equivalentAperture.toFixed(1)}`;
   
-  // Fix aperture display, keep one decimal place
-  const aperture = data.aperture ? parseFloat(data.aperture).toFixed(1) : parseFloat(focalApertureInput.value).toFixed(1);
-  const equivAperture = parseFloat(data.equivalentAperture).toFixed(1);
-  
-  document.getElementById("result-focal-aperture").textContent = `f/${aperture}`;
-  document.getElementById("result-focal-equivalent-aperture").textContent = `f/${equivAperture}`;
-  
-  // Additional information - Use more intuitive designer-friendly labels
+  // 附加信息
   document.getElementById("result-original-equiv-focal").textContent = `${data.originalEquivalentFocalLength}mm`;
   document.getElementById("result-new-equiv-focal").textContent = `${data.newEquivalentFocalLength}mm`;
-  
-  // Angle of view change percentage - Show more intuitive angle of view change
   document.getElementById("result-angle-change").textContent = data.angleOfViewChange;
-  
-  // Show actual used sensor area ratio
   document.getElementById("result-relative-area").textContent = `${data.relativeSensorArea}x`;
   
-  // Show result container
+  // 显示结果容器
   focalResultContainer.classList.remove("hidden");
   
-  // Scroll to result area
+  // 滚动到结果区域
   focalResultContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 /**
- * Show error message
+ * 显示错误信息
  */
 function showError(message) {
   console.error(message);
   
-  // Show banner in offline mode
+  // 在线下模式下显示横幅
   connectionStatus.classList.remove("hidden");
 }
 
 /**
- * Check API connection
+ * 检查API连接
  */
 async function checkApiConnection() {
   try {
@@ -577,10 +482,10 @@ async function checkApiConnection() {
   }
 }
 
-// When DOM loaded, initialize app
+// 当DOM加载完成后初始化应用
 document.addEventListener("DOMContentLoaded", initializeApp);
 
-// Local sensor data, for fallback calculation when API fails
+// 本地传感器数据，用于API失败时的回退计算
 const SENSORS = {
   "medium-format": { cropFactor: 0.7, name: "Medium Format" },
   "full-frame": { cropFactor: 1.0, name: "Full Frame" },

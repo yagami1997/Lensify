@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lensify - Sensor & Aperture Calculator</title>
     <link rel="stylesheet" href="malibu.css">
-    <!-- Using Google Fonts -->
+    <!-- 使用Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Add website icon -->
+    <!-- 添加网站图标 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📷</text></svg>">
 </head>
 <body>
@@ -37,7 +37,7 @@
                         <div class="form-group">
                             <label for="sensorSize">Select Sensor Size</label>
                             <select id="sensorSize" class="form-control">
-                                <!-- Camera sensor options -->
+                                <!-- 相机传感器选项 -->
                                 <optgroup label="Camera Sensors">
                                     <option value="medium-format">Medium Format</option>
                                     <option value="full-frame">Full Frame</option>
@@ -48,7 +48,7 @@
                                     <option value="1-inch">1-inch</option>
                                 </optgroup>
                                 
-                                <!-- Phone sensor options -->
+                                <!-- 手机传感器选项 -->
                                 <optgroup label="Phone Sensors">
                                     <option value="1/1.14">1/1.14-inch</option>
                                     <option value="1/1.28">1/1.28-inch</option>
@@ -117,13 +117,13 @@
                     </div>
                 </div>
                 
-                <!-- Focal length calculator tab -->
+                <!-- Focal Length Calculator tab -->
                 <div id="tab-focal" class="tab-content">
                     <div class="calculator-card">
                         <div class="form-group">
                             <label for="originalSensor">Original Sensor Size</label>
                             <select id="originalSensor" class="form-control">
-                                <!-- Camera sensor options -->
+                                <!-- 相机传感器选项 -->
                                 <optgroup label="Camera Sensors">
                                     <option value="medium-format">Medium Format</option>
                                     <option value="full-frame">Full Frame</option>
@@ -134,7 +134,7 @@
                                     <option value="1-inch">1-inch</option>
                                 </optgroup>
                                 
-                                <!-- Phone sensor options -->
+                                <!-- 手机传感器选项 -->
                                 <optgroup label="Phone Sensors">
                                     <option value="1/1.14">1/1.14-inch</option>
                                     <option value="1/1.28">1/1.28-inch</option>
@@ -238,29 +238,28 @@
                                 <h4>Additional Information</h4>
                                 <div class="result-grid">
                                     <div class="result-item">
-                                        <span class="result-label">Full-frame Focal Length (Original):</span>
+                                        <span class="result-label">Original Equiv. Focal Length:</span>
                                         <span id="result-original-equiv-focal" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Full-frame Focal Length (New):</span>
+                                        <span class="result-label">New Equiv. Focal Length:</span>
                                         <span id="result-new-equiv-focal" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Field of View Change:</span>
+                                        <span class="result-label">Angle of View Change:</span>
                                         <span id="result-angle-change" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Active Sensor Area:</span>
+                                        <span class="result-label">Relative Sensor Area:</span>
                                         <span id="result-relative-area" class="result-value">-</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <p class="explanation">
-                                This calculation shows the real-world impact of changing your focal length. 
-                                The "Full-frame Focal Length" values show what these settings would look like on a full-frame camera.
-                                The "Field of View Change" shows how much your composition widens or narrows.
-                                The "Active Sensor Area" shows what portion of your sensor is actually being used.
+                                This calculation shows how changing focal length affects the sensor size equivalence.
+                                It helps understand which sensor your lens effectively behaves like when changing focal length,
+                                useful for evaluating lens performance across different focal ranges.
                             </p>
                         </div>
                     </div>
