@@ -194,7 +194,17 @@ async function handleRequest(request) {
   const url = new URL(request.url);
   const path = url.pathname;
   
-  // Handle health check
+  // Handle static files for frontend
+  if (path === "/" || !path.startsWith("/api")) {
+    // Serve index.html for root path
+    if (path === "/") {
+      return fetch("https://lensify-calculator.pages.dev/index.html");
+    }
+    // Serve other static files
+    return fetch(`https://lensify-calculator.pages.dev${path}`);
+  }
+  
+  // Handle API health check
   if (path === "/api/health" || path === "/api") {
     return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
       headers: {
