@@ -6,10 +6,10 @@ main = "worker.js"
 compatibility_date = "2023-05-18"
 
 # 触发器配置
-# API 端点使用 /api 路径
+# 捕获所有路径请求
 [triggers]
 routes = [
-  { pattern = "lensify.encveil.dev/api/*", zone_name = "encveil.dev" }
+  { pattern = "lensify.encveil.dev/*", zone_name = "encveil.dev" }
 ]
 
 # 示例2：将Worker绑定到主域名的/api/calculate路径
