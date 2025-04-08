@@ -54,11 +54,10 @@ $RECYCLE.BIN/
 *.sublime-project
 *.sublime-workspace
 *.komodoproject
-.komodotools/ wrangler.toml
+.komodotools/
 
 # Configuration files with sensitive data
 wrangler.toml
-worker.js
 
 # Dependencies
 node_modules/
