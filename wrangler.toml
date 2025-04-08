@@ -6,11 +6,10 @@ main = "worker.js"
 compatibility_date = "2023-05-18"
 
 # 触发器配置
-# 以下是几种常见的路由配置示例，选择一种取消注释并替换example.com为您的实际域名
+# API 端点使用 /api 路径
 [triggers]
-# 示例1：将Worker绑定到api子域的/calculate路径
 routes = [
-  { pattern = "lensify.encveil.dev/*", zone_name = "encveil.dev" }
+  { pattern = "lensify.encveil.dev/api/*", zone_name = "encveil.dev" }
 ]
 
 # 示例2：将Worker绑定到主域名的/api/calculate路径
