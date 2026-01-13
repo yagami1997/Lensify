@@ -77,88 +77,26 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .logo-icon {
-  width: 72px;
-  height: 72px;
-  animation: lensRotate 20s linear infinite;
-  filter: drop-shadow(2px 4px 6px rgba(0, 49, 83, 0.2));
-}
-
-@keyframes lensRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.logo-icon:hover {
-  animation-play-state: paused;
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  width: 42px;
+  height: 42px;
 }
 
 h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--ocean-blue);
-  margin-bottom: 0;
-  letter-spacing: -1px;
-  line-height: 1;
-  background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #1a365d 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.logo-tagline {
-  font-size: 0.7rem;
+  font-size: 2.5rem;
   font-weight: 600;
-  letter-spacing: 3px;
-  color: var(--text-light);
-  margin-top: 2px;
-  text-transform: uppercase;
+  color: var(--ocean-blue);
+  margin-bottom: var(--spacing-xs);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: var(--text-light);
-  font-weight: 400;
-}
-
-/* 响应式 Logo */
-@media (max-width: 480px) {
-  .logo-container {
-    flex-direction: column;
-    gap: var(--spacing-sm);
-  }
-  
-  .logo-icon {
-    width: 56px;
-    height: 56px;
-  }
-  
-  .logo-text {
-    align-items: center;
-  }
-  
-  h1 {
-    font-size: 2.2rem;
-  }
-  
-  .logo-tagline {
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-  }
-  
-  .subtitle {
-    font-size: 0.95rem;
-  }
 }
 
 /* 卡片样式 */
