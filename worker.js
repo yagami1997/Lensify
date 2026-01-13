@@ -192,7 +192,7 @@ function calculateEquivalentSensor(originalSensorId, originalFocalLength, newFoc
 async function handleApiRequest(request) {
   const url = new URL(request.url);
   const path = url.pathname;
-
+  
   // Handle API health check
   if (path === "/api/health" || path === "/api") {
     return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
@@ -202,7 +202,7 @@ async function handleApiRequest(request) {
       }
     });
   }
-
+  
   // Handle OPTIONS preflight requests
   if (request.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -210,37 +210,37 @@ async function handleApiRequest(request) {
 
   // Handle regular aperture equivalent calculation
   if (path === "/api" || path === "/api/calculate") {
-    const sensorSize = url.searchParams.get("sensorSize");
+  const sensorSize = url.searchParams.get("sensorSize");
     const aperture = safeNumber(url.searchParams.get("aperture"));
-
-    if (!sensorSize || !SENSORS[sensorSize]) {
-      return new Response(
-        JSON.stringify({ error: "Invalid sensor size" }),
-        { status: 400, headers: corsHeaders }
-      );
-    }
+  
+  if (!sensorSize || !SENSORS[sensorSize]) {
+    return new Response(
+      JSON.stringify({ error: "Invalid sensor size" }),
+      { status: 400, headers: corsHeaders }
+    );
+  }
 
     if (aperture <= 0) {
-      return new Response(
-        JSON.stringify({ error: "Invalid aperture value" }),
-        { status: 400, headers: corsHeaders }
-      );
-    }
+    return new Response(
+      JSON.stringify({ error: "Invalid aperture value" }),
+      { status: 400, headers: corsHeaders }
+    );
+  }
 
     const sensorData = SENSORS[sensorSize];
     const cropFactor = safeNumber(sensorData.cropFactor, 1);
     const equivalentAperture = safeFormattedNumber(aperture * cropFactor, 1);
-
-    const result = {
+  
+  const result = {
       sensorSize: safeString(sensorData.name),
-      sensorId: sensorSize,
-      cropFactor: cropFactor,
+    sensorId: sensorSize,
+    cropFactor: cropFactor,
       inputAperture: safeFormattedNumber(aperture, 1),
-      equivalentAperture: equivalentAperture
-    };
+    equivalentAperture: equivalentAperture
+  };
 
-    return new Response(JSON.stringify(result), { headers: corsHeaders });
-  }
+  return new Response(JSON.stringify(result), { headers: corsHeaders });
+}
 
   // Handle focal length equivalent calculation
   if (path === "/api/focal-equiv" || path === "/api/focal-equivalent") {

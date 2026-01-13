@@ -81,9 +81,9 @@ header {
   margin-bottom: var(--spacing-xs);
 }
 
-.logo-icon {
-  width: 42px;
-  height: 42px;
+.logo-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
 }
 
 h1 {
@@ -91,7 +91,6 @@ h1 {
   font-weight: 600;
   color: var(--ocean-blue);
   margin-bottom: var(--spacing-xs);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
