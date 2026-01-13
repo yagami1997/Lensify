@@ -13,7 +13,7 @@
 </div>
 
 <div align="center">
-  <a href="https://lensify.pages.dev/">Live Demo</a> |
+  <a href="https://lensify.kyowarp.com/">Live Demo</a> |
   <a href="#documentation">Documentation</a> |
   <a href="#installation">Installation</a> |
   <a href="#features">Features</a> |
@@ -214,7 +214,7 @@ Response:
 
 ## 🌈 Experience It Live
 
-Try Lensify now: [https://lensify.pages.dev/](https://lensify.pages.dev/)
+Try Lensify now: [https://lensify.kyowarp.com/](https://lensify.kyowarp.com/)
 
 ## 🔄 Offline Mode
 
