@@ -250,7 +250,9 @@ This project is licensed under the GNU General Public License v3.0 - see the [LI
 ---
 
 <div align="center">
-  © 2025 Lensify - Precision tools for photographers and filmmakers
+  © 2026 Lensify - Precision tools for photographers and filmmakers
   
   <em>Crafted with ♥ for the global creative community</em>
+  
+  Last Updated: January 12, 2026 (PST)
 </div>
