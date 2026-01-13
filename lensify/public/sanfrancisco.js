@@ -6,8 +6,8 @@
  */
 
 // Worker API URL configuration - supports multiple URL formats for compatibility
-const API_URL = "https://lensify.kyowarp.com/api";
-const FALLBACK_URL = "https://lensify.kyowarp.com/api";
+const API_URL = "https://lensify.encveil.dev/api";
+const FALLBACK_URL = "https://lensify.encveil.dev/api";
 
 // Custom route URL examples (choose one based on your actual configuration and uncomment)
 // const API_URL = "https://api.example.com";                   // If using api.example.com/calculate*
@@ -468,9 +468,52 @@ function showError(message) {
  * 检查API连接
  */
 async function checkApiConnection() {
-  // 使用本地计算模式，隐藏连接状态提示
-  connectionStatus.classList.add("hidden");
-  console.log("Using local calculation mode");
+  try {
+    // 尝试连接API健康检查端点
+    const healthUrls = [
+      `${API_URL}/health`,
+      `${API_URL}`,
+      `${FALLBACK_URL}/health`
+    ];
+    
+    let connected = false;
+    
+    for (const url of healthUrls) {
+      try {
+        console.log("Checking API connection:", url);
+        const response = await fetch(url, { 
+          method: 'GET',
+          mode: 'cors'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          // 检查是否为有效的健康检查响应
+          if (data.status === "ok" || data.version || data.sensorSize) {
+            console.log("API connection established:", url);
+            connected = true;
+            break;
+          }
+        }
+      } catch (e) {
+        console.log("Failed to connect:", url, e.message);
+      }
+    }
+    
+    if (connected) {
+      // 连接成功，隐藏离线横幅
+      connectionStatus.classList.add("hidden");
+      console.log("Online mode - API connected");
+    } else {
+      // 连接失败，显示离线横幅
+      connectionStatus.classList.remove("hidden");
+      console.log("Offline mode - using local calculation");
+    }
+  } catch (error) {
+    // 发生错误，显示离线横幅
+    connectionStatus.classList.remove("hidden");
+    console.error("API connection check failed:", error);
+  }
 }
 
 // 当DOM加载完成后初始化应用
