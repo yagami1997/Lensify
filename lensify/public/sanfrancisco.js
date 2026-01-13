@@ -468,36 +468,9 @@ function showError(message) {
  * 检查API连接
  */
 async function checkApiConnection() {
-  try {
-    // 尝试几种不同的URL格式
-    const urlFormats = [
-      `${API_URL}/health`,
-      `${API_URL}`,
-      `${FALLBACK_URL}/health`
-    ];
-    
-    for (const url of urlFormats) {
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.status === "ok") {
-          console.log("API connection established:", url);
-          connectionStatus.classList.add("hidden");
-          return;
-        }
-      } catch (e) {
-        console.log("Failed with URL:", url, e.message);
-        continue;
-      }
-    }
-    
-    // 如果所有URL都失败了，显示离线模式
-    throw new Error("All API endpoints failed");
-  } catch (error) {
-    console.warn("API connection failed:", error.message);
-    connectionStatus.classList.remove("hidden");
-  }
+  // 使用本地计算模式，隐藏连接状态提示
+  connectionStatus.classList.add("hidden");
+  console.log("Using local calculation mode");
 }
 
 // 当DOM加载完成后初始化应用
