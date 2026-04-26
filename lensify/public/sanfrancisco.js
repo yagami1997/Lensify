@@ -6,8 +6,8 @@
  */
 
 // Worker API URL configuration - supports multiple URL formats for compatibility
-const API_URL = "https://lensify.kyowarp.com/api";
-const FALLBACK_URL = "https://lensify.kyowarp.com/api";
+const API_URL = "https://your-worker.your-subdomain.workers.dev/api";
+const FALLBACK_URL = "https://your-worker.your-subdomain.workers.dev/api";
 
 // Custom route URL examples (choose one based on your actual configuration and uncomment)
 // const API_URL = "https://api.example.com";                   // If using api.example.com/calculate*

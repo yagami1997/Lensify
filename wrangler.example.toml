@@ -1,14 +1,15 @@
 # Wrangler Configuration File
-# For deploying Workers using Cloudflare Wrangler CLI
+# Copy this file to wrangler.toml and fill in your own values.
+# wrangler.toml is gitignored and should never be committed.
 
 name = "lensify-calculator"
 main = "worker.js"
 compatibility_date = "2023-05-18"
 
-# Routes Configuration
+# Routes Configuration - replace with your own domain/zone
 [triggers]
 routes = [
-  { pattern = "lensify.kyowarp.com/*", zone_name = "kyowarp.com" }
+  { pattern = "yourdomain.com/*", zone_name = "yourdomain.com" }
 ]
 
 # SSL Configuration
@@ -27,7 +28,6 @@ upload.exclude = [
 ]
 
 # Cloudflare Pages Configuration
-# Note: For Pages, use pages_build_output_dir instead of bucket
 pages_build_output_dir = "lensify/public"
 
 # Environment Variables Example
@@ -38,4 +38,4 @@ pages_build_output_dir = "lensify/public"
 # npm install -g wrangler
 
 # To deploy Worker:
-# wrangler deploy 
+# wrangler deploy
