@@ -6,6 +6,7 @@
   <img src="https://img.shields.io/badge/JavaScript-ES6-yellow" alt="ES6">
   <img src="https://img.shields.io/badge/CSS-Custom-blueviolet" alt="Custom">
   <img src="https://img.shields.io/badge/status-active-success" alt="active">
+  <img src="https://img.shields.io/badge/updated-2026--04--28-informational" alt="updated">
 </div>
 
 <div align="center">
