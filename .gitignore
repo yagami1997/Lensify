@@ -3,6 +3,9 @@
 # 忽略计划文件
 Plan.md
 
+# 本地创意/草稿目录，不纳入版本跟踪
+idea/
+
 # 忽略node模块
 node_modules/
 
