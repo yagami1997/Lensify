@@ -17,7 +17,7 @@ export async function onRequest(context) {
     return new Response(null, { headers: corsHeaders });
   }
 
-  return new Response(JSON.stringify({ status: "ok", version: "1.1.0" }), {
+  return new Response(JSON.stringify({ status: "ok", version: "1.2.0" }), {
     headers: {
       ...corsHeaders,
       "Cache-Control": "no-cache"

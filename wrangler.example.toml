@@ -32,7 +32,7 @@ pages_build_output_dir = "lensify/public"
 
 # Environment Variables Example
 # [vars]
-# API_KEY = "your-api-key-here"
+# PAGES_URL = "https://your-project.pages.dev"
 
 # To install Wrangler CLI:
 # npm install -g wrangler

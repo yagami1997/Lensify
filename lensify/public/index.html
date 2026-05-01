@@ -53,7 +53,7 @@
                                 
                                 <!-- 手机传感器选项 -->
                                 <optgroup label="Phone Sensors">
-                                    <option value="1/1.14">1/1.14-inch</option>
+                                    <option value="1/1.12">1/1.12-inch</option>
                                     <option value="1/1.28">1/1.28-inch</option>
                                     <option value="1/1.3">1/1.3-inch</option>
                                     <option value="1/1.31">1/1.31-inch</option>
@@ -139,7 +139,7 @@
                                 
                                 <!-- 手机传感器选项 -->
                                 <optgroup label="Phone Sensors">
-                                    <option value="1/1.14">1/1.14-inch</option>
+                                    <option value="1/1.12">1/1.12-inch</option>
                                     <option value="1/1.28">1/1.28-inch</option>
                                     <option value="1/1.3">1/1.3-inch</option>
                                     <option value="1/1.31">1/1.31-inch</option>
@@ -171,12 +171,12 @@
                         <div class="focal-length-inputs">
                             <div class="form-group">
                                 <label for="originalFocal">Original Focal Length (mm)</label>
-                                <input type="number" id="originalFocal" class="form-control" step="1" min="1" value="23">
+                                <input type="number" id="originalFocal" class="form-control" step="0.1" min="0.1" value="23">
                             </div>
 
                             <div class="form-group">
                                 <label for="newFocal">New Focal Length (mm)</label>
-                                <input type="number" id="newFocal" class="form-control" step="1" min="1" value="35">
+                                <input type="number" id="newFocal" class="form-control" step="0.1" min="0.1" value="35">
                             </div>
                         </div>
 
@@ -201,16 +201,16 @@
                                         <span id="result-original-sensor" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Original Crop Factor:</span>
+                                        <span class="result-label">Crop Factor:</span>
                                         <span id="result-original-crop" class="result-value">-</span>
                                     </div>
-                                    <div class="result-item highlight">
-                                        <span class="result-label">Equivalent Sensor:</span>
-                                        <span id="result-equivalent-sensor" class="result-value">-</span>
+                                    <div class="result-item">
+                                        <span class="result-label">Input Aperture:</span>
+                                        <span id="result-focal-aperture" class="result-value">-</span>
                                     </div>
                                     <div class="result-item highlight">
-                                        <span class="result-label">New Crop Factor:</span>
-                                        <span id="result-new-crop" class="result-value">-</span>
+                                        <span class="result-label">DOF Equivalent Aperture:</span>
+                                        <span id="result-focal-equivalent-aperture" class="result-value">-</span>
                                     </div>
                                 </div>
                             </div>
@@ -227,12 +227,12 @@
                                         <span id="result-new-focal" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Aperture:</span>
-                                        <span id="result-focal-aperture" class="result-value">-</span>
+                                        <span class="result-label">Original Horizontal AOV:</span>
+                                        <span id="result-original-aov" class="result-value">-</span>
                                     </div>
                                     <div class="result-item highlight">
-                                        <span class="result-label">Equivalent Aperture:</span>
-                                        <span id="result-focal-equivalent-aperture" class="result-value">-</span>
+                                        <span class="result-label">New Horizontal AOV:</span>
+                                        <span id="result-new-aov" class="result-value">-</span>
                                     </div>
                                 </div>
                             </div>
@@ -253,16 +253,20 @@
                                         <span id="result-angle-change" class="result-value">-</span>
                                     </div>
                                     <div class="result-item">
-                                        <span class="result-label">Relative Sensor Area:</span>
+                                        <span class="result-label">Perspective Change:</span>
+                                        <span id="result-perspective-change" class="result-value">-</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Relative Framing Area:</span>
                                         <span id="result-relative-area" class="result-value">-</span>
                                     </div>
                                 </div>
                             </div>
                             
                             <p class="explanation">
-                                This calculation shows how changing focal length affects the sensor size equivalence.
-                                It helps understand which sensor your lens effectively behaves like when changing focal length,
-                                useful for evaluating lens performance across different focal ranges.
+                                This calculator keeps the sensor fixed and shows what changes when you switch lenses:
+                                full-frame equivalent focal length, depth-of-field equivalent aperture, angle of view,
+                                and framing change.
                             </p>
                         </div>
                     </div>

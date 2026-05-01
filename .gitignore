@@ -1,26 +1,50 @@
-# 根目录 .gitignore 文件
+# Root ignore rules
 
-# 忽略计划文件
+# Planning and local drafts
 Plan.md
-
-# 本地创意/草稿目录，不纳入版本跟踪
 idea/
 
-# 忽略node模块
+# AI coding workspaces
+.claude/
+.codex/
+.cursor/
+.windsurf/
+.roo/
+.aider/
+.aider*
+.avante/
+.agents/
+
+# Dependencies
 node_modules/
 
-# 忽略构建文件
+# Build outputs
 dist/
 build/
 
-# 忽略本地环境文件
+# Local environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*
 
-# Mac OS 垃圾文件
+# Local Cloudflare config with secrets
+wrangler.toml
+
+# Editor and IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+.komodotools/
+*.swp
+*.swo
+*~
+
+# macOS files
 .DS_Store
 .DS_Store?
 ._*
@@ -33,7 +57,7 @@ Icon
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
-# Windows 垃圾文件
+# Windows files
 Thumbs.db
 ehthumbs.db
 Desktop.ini
@@ -44,43 +68,8 @@ $RECYCLE.BIN/
 *.msp
 *.lnk
 
-# Linux 垃圾文件
-*~
-.fuse_hidden*
+# Linux files
 .directory
 .Trash-*
+.fuse_hidden*
 .nfs*
-
-# IDE和编辑器文件
-.idea/
-.vscode/
-*.sublime-project
-*.sublime-workspace
-*.komodoproject
-.komodotools/
-
-# Configuration files with sensitive data
-wrangler.toml
-
-# Dependencies
-node_modules/
-
-# Build outputs
-dist/
-build/
-
-# Environment files
-.env
-.env.local
-.env.*
-
-# System files
-.DS_Store
-Thumbs.db
-
-# IDE files
-.idea/
-.vscode/
-*.swp
-*.swo
- 
